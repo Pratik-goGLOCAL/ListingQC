@@ -5,13 +5,37 @@ import streamlit as st
 import pickle as pkl
 import pandas as pd
 import subprocess
+import streamlit_authenticator as stauth
 
 st.set_page_config(
-    page_title="QCListing"
+    page_title="ListingQC"
 )
 
-st.title("QCListing")
+st.title("ListingQC")
 # st.sidebar.success("Select Action")
+
+### AUTH
+with open('DataStore/auth.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
+
+name,authentication_status,username = authenticator.login('Login','main')
+
+if st.session_state["authentication_status"]:
+    authenticator.logout('Logout', 'main')
+    st.write(f'Welcome *{st.session_state["name"]}*')
+    # st.title('Some content')
+elif st.session_state["authentication_status"] == False:
+    st.error('Username/password is incorrect')
+elif st.session_state["authentication_status"] == None:
+    st.warning('Please enter your username and password')
 
 # Loading data
 
@@ -47,7 +71,7 @@ st.session_state['Market_Place'] = marketplace
 
 # Select the Brand Name
 
-brand_name = st.text_input("Search for a Brand Name(if multiple then seperate using ' , ') eg. Yellow Chimes", st.session_state["Brand_name"])
+brand_name = st.text_input("Search for a Brand Name (if multiple then seperate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
 submit = st.button("Submit")
 
 pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_list.csv',index=False)
