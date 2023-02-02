@@ -73,4 +73,4 @@ if submit:
     st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
     st.write('Overall Data Size is {}'.format(overall_data.shape))
     overall_data.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
-st.dataframe(overall_data)
+    st.dataframe(overall_data)
