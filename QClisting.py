@@ -55,7 +55,7 @@ pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_li
 if submit:
     st.session_state["Brand_name"] = brand_name
     st.write("Scraping Started for {} ".format(brand_name))
-    cmd ='python AmazonSearchProductSpider\spiders\__init__.py'
+    cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
     os.system(cmd)
     # result = subprocess.run(command.split(),stdout=subprocess.PIPE)
     df = pd.read_csv('DataStore/Scrapy_Res.csv')
