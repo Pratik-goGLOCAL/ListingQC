@@ -1,3 +1,4 @@
+streamlit-authenticator==0.2.1
 alabaster @ file:///home/ktietz/src/ci/alabaster_1611921544520/work
 altair==4.2.2
 arrow @ file:///C:/b/abs_b4078n3t7m/croot/arrow_1666726878744/work
@@ -170,7 +171,6 @@ sphinxcontrib-serializinghtml @ file:///tmp/build/80754af9/sphinxcontrib-seriali
 spyder @ file:///C:/b/abs_8b9xyq0tgd/croots/recipe/spyder_1663056826743/work
 spyder-kernels @ file:///C:/b/abs_bcwwacv768/croots/recipe/spyder-kernels_1662457887005/work
 streamlit==1.17.0
-streamlit-authenticator==0.2.1
 streamlit-option-menu==0.3.2
 text-unidecode @ file:///Users/ktietz/demo/mc3/conda-bld/text-unidecode_1629401354553/work
 textdistance @ file:///tmp/build/80754af9/textdistance_1612461398012/work
