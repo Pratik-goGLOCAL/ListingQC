@@ -37,6 +37,7 @@ dill @ file:///C:/b/abs_42h_07z1yj/croot/dill_1667919550096/work
 docutils @ file:///C:/Windows/TEMP/abs_24e5e278-4d1c-47eb-97b9-f761d871f482dy2vg450/croots/recipe/docutils_1657175444608/work
 entrypoints @ file:///C:/ci/entrypoints_1649926676279/work
 et-xmlfile==1.1.0
+extra-streamlit-components==0.1.56
 fastjsonschema @ file:///C:/Users/BUILDE~1/AppData/Local/Temp/abs_ebruxzvd08/croots/recipe/python-fastjsonschema_1661376484940/work
 filelock==3.9.0
 flake8 @ file:///opt/conda/conda-bld/flake8_1648129545443/work
@@ -115,6 +116,7 @@ PyDispatcher==2.0.6
 pydocstyle @ file:///tmp/build/80754af9/pydocstyle_1621600989141/work
 pyflakes @ file:///tmp/build/80754af9/pyflakes_1636644436481/work
 Pygments==2.14.0
+PyJWT==2.6.0
 pylint @ file:///C:/Windows/TEMP/abs_518eqlbmoo/croots/recipe/pylint_1659110354241/work
 pyls-spyder==0.4.0
 Pympler==1.0.1
@@ -168,6 +170,7 @@ sphinxcontrib-serializinghtml @ file:///tmp/build/80754af9/sphinxcontrib-seriali
 spyder @ file:///C:/b/abs_8b9xyq0tgd/croots/recipe/spyder_1663056826743/work
 spyder-kernels @ file:///C:/b/abs_bcwwacv768/croots/recipe/spyder-kernels_1662457887005/work
 streamlit==1.17.0
+streamlit-authenticator==0.2.1
 streamlit-option-menu==0.3.2
 text-unidecode @ file:///Users/ktietz/demo/mc3/conda-bld/text-unidecode_1629401354553/work
 textdistance @ file:///tmp/build/80754af9/textdistance_1612461398012/work
