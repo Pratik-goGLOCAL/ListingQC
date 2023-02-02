@@ -1,0 +1,14 @@
+credentials:
+  usernames:
+    PratikG:
+      email: pratik.g@goglocal.com
+      name: Pratik Ghongade
+      password: "FirstApp_123" # To be replaced with hashed password
+    DataScience:
+      email: pratik.g@goglocal.com
+      name: DataScience Team
+      password: "AIgoGLOCAL" # To be replaced with hashed password
+cookie:
+  expiry_days: 30
+  key: random_signature_key
+  name: random_cookie_name
