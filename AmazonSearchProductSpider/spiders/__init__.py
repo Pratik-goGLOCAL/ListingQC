@@ -1,6 +1,4 @@
-import os
-cmd ='conda install -c conda-forge scrapy'
-os.system(cmd)
+import pandas as pd
 import json
 import scrapy
 from scrapy.crawler import CrawlerProcess,CrawlerRunner
@@ -9,7 +7,6 @@ import re
 import sys
 sys.path.append(r'C:\Users\prati\Documents\Projects\QClisting')
 from AmazonSearchProductSpider.items import AmazonsearchproductspiderItem
-import pandas as pd
 from loguru import  logger
 
 class AmazonSearchProductSpider(scrapy.Spider):
