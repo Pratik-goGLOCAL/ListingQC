@@ -18,7 +18,7 @@ st.set_page_config(
     page_title="Listing QC"
 )
 
-st.title("ListingQC")
+st.title("Listing QC")
 # st.sidebar.success("Select Action")
 
 ### AUTH
