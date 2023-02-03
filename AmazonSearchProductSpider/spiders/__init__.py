@@ -5,7 +5,7 @@ from scrapy.crawler import CrawlerProcess,CrawlerRunner
 from urllib.parse import urljoin
 import re
 import sys
-sys.path.append(r'C:\Users\prati\Documents\Projects\LisitingQC')
+sys.path.append(r'\LisitingQC')
 from AmazonSearchProductSpider.items import AmazonsearchproductspiderItem
 import pandas as pd
 from loguru import  logger
@@ -140,13 +140,13 @@ class AmazonSearchProductSpider(scrapy.Spider):
     # cmd ='scrapy crawl amazon_search_product -o emails.json'
     # os.system(cmd)
 
-# def start_crawling():
-if __name__=='__main__':
-    process = CrawlerProcess(settings={
-    "FEEDS": {
-        "DataStore/Scrapy_Res.csv": {"format": "csv","overwrite":True},
-    }
-    })
-    #,"overwrite":True
-    process.crawl(AmazonSearchProductSpider)
-    process.start()
+# # def start_crawling():
+# if __name__=='__main__':
+#     process = CrawlerProcess(settings={
+#     "FEEDS": {
+#         "DataStore/Scrapy_Res.csv": {"format": "csv","overwrite":True},
+#     }
+#     })
+#     #,"overwrite":True
+#     process.crawl(AmazonSearchProductSpider)
+#     process.start()
