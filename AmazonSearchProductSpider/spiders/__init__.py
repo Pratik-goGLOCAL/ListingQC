@@ -1,3 +1,4 @@
+import os
 cmd ='conda install -c conda-forge scrapy'
 os.system(cmd)
 import json
