@@ -16,7 +16,7 @@ from loguru import logger
 from fuzzywuzzy import fuzz
 
 # Load Data
-special_char = pd.read_excel('Special characters list.xlsx',header=None)
+special_char = pd.read_csv('Special characters list.csv')['chars']
 my_tool = language_tool_python.LanguageTool('en-US')
 
 ###########################################################################################################
