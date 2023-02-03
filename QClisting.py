@@ -81,7 +81,10 @@ if submit:
     # from Run_Spider import run_spider
     # run_spider()
     # result = subprocess.run(command.split(),stdout=subprocess.PIPE)
-    df = pd.read_csv('DataStore/Scrapy_Res.csv')
+    try:
+        df = pd.read_csv('DataStore/Scrapy_Res.csv')
+    except:
+        df = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
     listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',
     'product_rating_count','country_of_origin','product_weight','product_material','product_category','item_height','item_length','item_width','aplus','description']
     df = df[listing_cols]
