@@ -8,9 +8,10 @@ import subprocess
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+from excel_checks import QC_check1
 
 st.set_page_config(
-    page_title="ListingQC"
+    page_title="Listing QC"
 )
 
 st.title("ListingQC")
@@ -64,12 +65,17 @@ if authentication_status:
 
     # Select the Brand Name
 
-    brand_name = st.text_input("Search for a Brand Name (if multiple then seperate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
-    submit = st.button("Submit")
+    brand_name = st.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
+    scrape_submit = st.button("Submit")
 
     pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_list.csv',index=False)
     # command = 'python AmazonSearchProductSpider\spiders\__init__.py'
-    if submit:
+    @st.cache
+    def convert_df(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+        return df.to_csv().encode('utf-8')
+
+    if scrape_submit:
         st.session_state["Brand_name"] = brand_name
         st.write("Scraping Started for {} ".format(brand_name))
         cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
@@ -87,10 +93,27 @@ if authentication_status:
             # st.write('FALSE')
             overall_data = pd.DataFrame(columns=listing_cols)
         overall_data = pd.concat([df,overall_data])
-        st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
-        st.write('Overall Data Size is {}'.format(overall_data.shape))
+        st.write("Scraping Completed!!! ")
+        view_df = st.button("View")
         overall_data.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
-        st.dataframe(overall_data)
+        if view_df:
+            st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
+            st.dataframe(df)
+        st.write('QC Check on Data Fields Started .....')
+        df = pd.read_csv('DataStore/Scrapy_Res.csv')
+        df.fillna('NULL',inplace = True)
+        res_df = QC_check1(df[['product_brand','product_title','description','product_bullets']].copy())
+        st.write('QC Check on Data Fields Completed!!!')
+        display_res = st.button('Display')
+        if display_res:
+            st.dataframe(res_df)
+        csv = convert_df(res_df)
+        st.download_button(
+            label="Download",
+            data=csv,
+            file_name='DataStore/QC_res_ScrapedData.csv',
+            mime='text/csv',
+        )
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:

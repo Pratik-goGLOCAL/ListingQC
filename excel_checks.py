@@ -64,7 +64,7 @@ def spellcheck(my_text,my_tool):
         return 0
     else:
         return 1
-    return [myMistakes,myCorrections,startPositions,endPositions]
+    # return [myMistakes,myCorrections,startPositions,endPositions]
     
 ###########################################################################################################
 ## Special Character Check
@@ -137,7 +137,7 @@ def get_sum(lst):
     return sum(lst)
 
 def get_SpellCheck_flag(data):
-    data['final_entire_spellcheck'] = data[['title_spellcheck','description_spellcheck','bullets_spellcheck']].apply(lambda x:1 if get_sum([x.title_spellcheck,x.description_spellcheck,x.bullets_spellcheck])==3 else 0,axis = 1)
+    data['final_entire_spellcheck'] = data[['title_spellcheck','description_spellcheck','bullets_spellcheck']].product(axis = 1)
     return data['final_entire_spellcheck']
 
 ###########################################################################################################
@@ -216,8 +216,8 @@ def get_dimensions(text):
         multi_units_value.append(qc_res[1])
     return [1,same_unit_in_dim,check_values(multi_units_value)]
             
-data['complete_data'] = data['title']+data['description']+data['bullet_points']#+
 def get_Dimensions_flag(data):
+    data['complete_data'] = data['product_title']+data['description']+data['product_bullets']#+
     data['dimensionality_inter_check'] = data['complete_data'].progress_apply(lambda x: get_dimensions(x))
     return data['dimensionality_inter_check']
 
@@ -238,7 +238,7 @@ def QC_check1(data):
 
     data['final_entire_spellcheck'] = get_SpellCheck_flag(data.copy())
 
-    data['dimensionality_inter_check'] = get_Dimensions_flag(data.copy())
+    data['final_dimensionality_check'] = get_Dimensions_flag(data.copy())
 
     data['final_sentence_case_check'] = get_SentenceCase_flag(data.copy())
 

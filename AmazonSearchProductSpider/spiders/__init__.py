@@ -5,7 +5,7 @@ from scrapy.crawler import CrawlerProcess,CrawlerRunner
 from urllib.parse import urljoin
 import re
 import sys
-sys.path.append(r'C:\Users\prati\Documents\Projects\QClisting')
+sys.path.append(r'C:\Users\prati\Documents\Projects\LisitingQC')
 from AmazonSearchProductSpider.items import AmazonsearchproductspiderItem
 import pandas as pd
 from loguru import  logger
