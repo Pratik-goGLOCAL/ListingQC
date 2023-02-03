@@ -103,15 +103,15 @@ if authentication_status:
         # if view_df:
         st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
         st.dataframe(df)
-        st.write('QC Check on Data Fields Started .....')
-        df = pd.read_csv('DataStore/Scrapy_Res.csv')
-        df.fillna('NULL',inplace = True)
-        res_df = QC_check1(df[['product_brand','product_title','description','product_bullets']].copy())
-        st.write('QC Check on Data Fields Completed!!!')
-        # display_res = st.button('Display')
-        # if display_res:
-        st.dataframe(res_df)
-        csv = convert_df(res_df)
+        # st.write('QC Check on Data Fields Started .....')
+        # df = pd.read_csv('DataStore/Scrapy_Res.csv')
+        # df.fillna('NULL',inplace = True)
+        # res_df = QC_check1(df[['product_brand','product_title','description','product_bullets']].copy())
+        # st.write('QC Check on Data Fields Completed!!!')
+        # # display_res = st.button('Display')
+        # # if display_res:
+        # st.dataframe(res_df)
+        csv = convert_df(df)
         st.download_button(
             label="Download",
             data=csv,
