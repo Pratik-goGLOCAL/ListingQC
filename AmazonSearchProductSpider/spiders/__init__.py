@@ -1,4 +1,5 @@
-
+cmd ='conda install -c conda-forge scrapy'
+os.system(cmd)
 import json
 import scrapy
 from scrapy.crawler import CrawlerProcess,CrawlerRunner
