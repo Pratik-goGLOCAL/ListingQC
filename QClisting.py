@@ -12,8 +12,7 @@ from scrapy.crawler import CrawlerProcess,CrawlerRunner
 from urllib.parse import urljoin
 import re
 import sys
-sys.path.append(r'C:\Users\prati\Documents\Projects\QClisting')
-from AmazonSearchProductSpider.items import AmazonsearchproductspiderItem
+sys.path.append('/QClisting')
 from loguru import  logger
 
 
@@ -72,8 +71,10 @@ def convert_df(df):
 if submit:
     st.session_state["Brand_name"] = brand_name
     st.write("Scraping Started for {} ".format(brand_name))
-    cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
-    os.system(cmd)
+    # cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
+    # os.system(cmd)
+    from Run_Spider import run_spider
+    run_spider()
     # result = subprocess.run(command.split(),stdout=subprocess.PIPE)
     df = pd.read_csv('DataStore/Scrapy_Res.csv')
     listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',

@@ -5,7 +5,7 @@ from scrapy.crawler import CrawlerProcess,CrawlerRunner
 from urllib.parse import urljoin
 import re
 import sys
-sys.path.append(r'C:\Users\prati\Documents\Projects\QClisting')
+sys.path.append(r'\QClisting')
 from AmazonSearchProductSpider.items import AmazonsearchproductspiderItem
 from loguru import  logger
 
@@ -140,12 +140,3 @@ class AmazonSearchProductSpider(scrapy.Spider):
     # os.system(cmd)
 
 # def start_crawling():
-if __name__=='__main__':
-    process = CrawlerProcess(settings={
-    "FEEDS": {
-        "DataStore/Scrapy_Res.csv": {"format": "csv","overwrite":True},
-    }
-    })
-    #,"overwrite":True
-    process.crawl(AmazonSearchProductSpider)
-    process.start()
