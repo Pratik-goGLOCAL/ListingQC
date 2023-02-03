@@ -3,8 +3,19 @@ import numpy as np
 import os
 import streamlit as st
 import pickle as pkl
-import pandas as pd
+
 import subprocess
+
+import json
+import scrapy
+from scrapy.crawler import CrawlerProcess,CrawlerRunner
+from urllib.parse import urljoin
+import re
+import sys
+sys.path.append(r'C:\Users\prati\Documents\Projects\QClisting')
+from AmazonSearchProductSpider.items import AmazonsearchproductspiderItem
+from loguru import  logger
+
 
 
 st.set_page_config(
