@@ -12,7 +12,7 @@ from yaml.loader import SafeLoader
 from loguru import logger
 from fuzzywuzzy import fuzz
 # from excel_checks import QC_check1
-
+import sys
 
 st.set_page_config(
     page_title="Listing QC"
@@ -111,13 +111,8 @@ if authentication_status:
         # df.fillna('NULL',inplace = True)
         # res_df = QC_check1(df[['product_brand','product_title','description','product_bullets']].copy())
         # st.write('QC Check on Data Fields Completed!!!')
-<<<<<<< HEAD
         # # display_res = st.button('Display')
         # # if display_res:
-=======
-        # display_res = st.button('Display')
-        # if display_res:
->>>>>>> AuthVersoin1.1
         # st.dataframe(res_df)
         csv = convert_df(df)
         st.download_button(
