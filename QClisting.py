@@ -98,19 +98,19 @@ if authentication_status:
             overall_data = pd.DataFrame(columns=listing_cols)
         overall_data = pd.concat([df,overall_data])
         st.write("Scraping Completed!!! ")
-        view_df = st.button("View")
         overall_data.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
-        if view_df:
-            st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
-            st.dataframe(df)
+        # view_df = st.button("View")
+        # if view_df:
+        st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
+        st.dataframe(df)
         st.write('QC Check on Data Fields Started .....')
         df = pd.read_csv('DataStore/Scrapy_Res.csv')
         df.fillna('NULL',inplace = True)
         res_df = QC_check1(df[['product_brand','product_title','description','product_bullets']].copy())
         st.write('QC Check on Data Fields Completed!!!')
-        display_res = st.button('Display')
-        if display_res:
-            st.dataframe(res_df)
+        # display_res = st.button('Display')
+        # if display_res:
+        st.dataframe(res_df)
         csv = convert_df(res_df)
         st.download_button(
             label="Download",

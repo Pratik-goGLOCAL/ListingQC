@@ -69,7 +69,7 @@ def spellcheck(my_text,my_tool):
 ###########################################################################################################
 ## Special Character Check
 def special_char_check(x):
-    if len(set(special_char[0])) - len(set(special_char[0].tolist())-set(x))>0:
+    if len(set(special_char[0])) - len(set(special_char.tolist())-set(x))>0:
         return 0
     else:
         return 1
@@ -79,13 +79,13 @@ def special_char_check(x):
 def get_Title_flag(data):
     ## Brand Name Present
     bn_check = lambda x,y:1 if y.split(' ')[0].strip().lower()==x.strip().lower() else 0
-    data['title_brand_present'] = data[['product_brand','product_title']].apply(lambda x:bn_check(x.brand_name,x.title),axis = 1)
+    data['title_brand_present'] = data[['product_brand','product_title']].apply(lambda x:bn_check(x.product_brand,x.product_title),axis = 1)
 
     ## Sentence Case
-    data['title_sentence_case'] = data[['product_brand','product_title',"title_brand_present"]].apply(lambda x:sentence_case(x.brand_name,x.title,x.title_brand_present),axis = 1)
+    data['title_sentence_case'] = data[['product_brand','product_title',"title_brand_present"]].apply(lambda x:sentence_case(x.product_brand,x.product_title,x.title_brand_present),axis = 1)
 
     ## Spell Check
-    data['title_spellcheck'] = data['product_title'].progress_apply(lambda x:spellcheck(x,my_tool))
+    data['title_spellcheck'] = data['product_title'].apply(lambda x:spellcheck(x,my_tool))
     data['final_title_check_flag'] = data[['title_brand_present','title_sentence_case','title_spellcheck']].product(axis = 1)
     return data['final_title_check_flag']
 
@@ -109,7 +109,7 @@ def get_Description_flag(data):
     
     data['description_multiline_check'] = data['description'].apply(lambda x:multiline_check(x))
     ## Spell Check 
-    data['description_spellcheck'] = data['description'].progress_apply(lambda x:spellcheck(x,my_tool))
+    data['description_spellcheck'] = data['description'].apply(lambda x:spellcheck(x,my_tool))
     ## Final Description check Flag
     data['final_description_check_flag'] = data[['description_special_chr_check','description_char_constrained_2000','description_multiline_check','description_spellcheck']].product(axis = 1)
 
@@ -121,11 +121,11 @@ def get_BulletPoints_flag(data):
     ## Special Character check
     data['bullets_special_chr_check'] = data['product_bullets'].apply(lambda x:special_char_check(x))
     ## Number of bullet points check (atleast 3 points)
-    data['bullets_number_check'] = data['product_bullets'].progress_apply(lambda x:1 if x.count('\n')>=2 else 0)
+    data['bullets_number_check'] = data['product_bullets'].apply(lambda x:1 if x.count('\n')>=2 else 0)
     ## Bullet Points start with capital letter check
     data['bullets_first_capital_check'] = data['product_bullets'].apply(lambda x: int(''.join([s[0] for s in x.split('\n')]).isupper()) )
     ## Spell Check
-    data['bullets_spellcheck'] = data['product_bullets'].progress_apply(lambda x:spellcheck(x,my_tool))
+    data['bullets_spellcheck'] = data['product_bullets'].apply(lambda x:spellcheck(x,my_tool))
     ## Final Bullet Points check Flag
     data['final_bullet_point_check_flag'] = data[['bullets_special_chr_check','bullets_number_check','bullets_first_capital_check','bullets_spellcheck']].product(axis = 1)
 
@@ -218,7 +218,7 @@ def get_dimensions(text):
             
 def get_Dimensions_flag(data):
     data['complete_data'] = data['product_title']+data['description']+data['product_bullets']#+
-    data['dimensionality_inter_check'] = data['complete_data'].progress_apply(lambda x: get_dimensions(x))
+    data['dimensionality_inter_check'] = data['complete_data'].apply(lambda x: get_dimensions(x))
     return data['dimensionality_inter_check']
 
 ###########################################################################################################
@@ -230,11 +230,11 @@ def get_SentenceCase_flag(data):
 ##############################################################################################################
 ## Get all the flags
 def QC_check1(data):
-    data['final_title_check_flag'] = get_Title_flag(data.copy())
+    data['final_title_check_flag'] = get_Title_flag(data)
 
-    data['final_description_check_flag'] = get_Description_flag(data.copy())
+    data['final_description_check_flag'] = get_Description_flag(data)
 
-    data['final_bullet_point_check_flag'] = get_BulletPoints_flag(data.copy())
+    data['final_bullet_point_check_flag'] = get_BulletPoints_flag(data)
 
     data['final_entire_spellcheck'] = get_SpellCheck_flag(data.copy())
 
