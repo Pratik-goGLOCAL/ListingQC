@@ -15,7 +15,7 @@ class AmazonSearchProductSpider(scrapy.Spider):
     #     'FEEDS': { 'C:/Users/prati/Documents/Projects/QClisting/DataStore/items.csv': { 'format': 'csv',}}
     #     }
     def start_requests(self):
-        keyword_list = [pd.read_csv(r'DataStore\keyword_list.csv')['keyword_list'][0]]
+        keyword_list = [pd.read_csv('DataStore/keyword_list.csv')['keyword_list'][0]]
         logger.info('The Search Keywords are {}'.format(keyword_list))
         for keyword in keyword_list:
             amazon_search_url = f'https://www.amazon.in/s?k={keyword}&page=1'
