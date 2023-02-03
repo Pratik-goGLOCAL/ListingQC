@@ -8,19 +8,11 @@ import subprocess
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
-<<<<<<< HEAD
 # import language_tool_python
 from loguru import logger
 from fuzzywuzzy import fuzz
 # from excel_checks import QC_check1
 
-=======
-# from spellchecker import SpellChecker
-from loguru import logger
-from fuzzywuzzy import fuzz
-# from excel_checks import QC_check1
-import sys
->>>>>>> AuthVersoin1.1
 
 st.set_page_config(
     page_title="Listing QC"
