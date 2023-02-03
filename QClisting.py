@@ -8,11 +8,19 @@ import subprocess
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+<<<<<<< HEAD
 # import language_tool_python
 from loguru import logger
 from fuzzywuzzy import fuzz
 # from excel_checks import QC_check1
 
+=======
+# from spellchecker import SpellChecker
+from loguru import logger
+from fuzzywuzzy import fuzz
+# from excel_checks import QC_check1
+import sys
+>>>>>>> AuthVersoin1.1
 
 st.set_page_config(
     page_title="Listing QC"
@@ -82,8 +90,11 @@ if authentication_status:
     if scrape_submit:
         st.session_state["Brand_name"] = brand_name
         st.write("Scraping Started for {} ".format(brand_name))
-        cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
-        os.system(cmd)
+        # cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
+        # os.system(cmd)
+        import subprocess
+        variable = 'Run_Spider.py'
+        subprocess.call(f"{sys.executable} " + variable , shell=True)
         # result = subprocess.run(command.split(),stdout=subprocess.PIPE)
         df = pd.read_csv('DataStore/Scrapy_Res.csv')
         listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',
@@ -108,8 +119,13 @@ if authentication_status:
         # df.fillna('NULL',inplace = True)
         # res_df = QC_check1(df[['product_brand','product_title','description','product_bullets']].copy())
         # st.write('QC Check on Data Fields Completed!!!')
+<<<<<<< HEAD
         # # display_res = st.button('Display')
         # # if display_res:
+=======
+        # display_res = st.button('Display')
+        # if display_res:
+>>>>>>> AuthVersoin1.1
         # st.dataframe(res_df)
         csv = convert_df(df)
         st.download_button(
