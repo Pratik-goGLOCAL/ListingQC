@@ -19,8 +19,8 @@ NEWSPIDER_MODULE = 'AmazonSearchProductSpider.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
-# PROXY_POOL_ENABLED = True
-USER_AGENT ="https://developers.whatismybrowser.com/useragents/parse/79-googlebot"
+PROXY_POOL_ENABLED = True
+# USER_AGENT ="https://developers.whatismybrowser.com/useragents/parse/79-googlebot"
 
 DOWNLOADER_MIDDLEWARES = {
     # ...
