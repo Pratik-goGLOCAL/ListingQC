@@ -74,7 +74,7 @@ if submit:
     # cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
     # os.system(cmd)
     import subprocess
-    variable = Run_Spider.py
+    variable = 'Run_Spider.py'
     subprocess.call(f"{sys.executable} " + variable, shell=True)
     # cmd ='python Run_Spider.py'
     # os.system(cmd)
