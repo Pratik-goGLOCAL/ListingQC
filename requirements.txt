@@ -1,4 +1,3 @@
-alabaster @ file:///home/ktietz/src/ci/alabaster_1611921544520/work
 altair==4.2.2
 arrow @ file:///C:/b/abs_b4078n3t7m/croot/arrow_1666726878744/work
 astroid @ file:///C:/Windows/TEMP/abs_b0dtxgpicv/croots/recipe/astroid_1659023126745/work
