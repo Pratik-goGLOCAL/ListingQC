@@ -73,8 +73,11 @@ if submit:
     st.write("Scraping Started for {} ".format(brand_name))
     # cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
     # os.system(cmd)
-    cmd ='python Run_Spider.py'
-    os.system(cmd)
+    import subprocess
+    variable = Run_Spider.py
+    subprocess.call(f"{sys.executable} " + variable, shell=True)
+    # cmd ='python Run_Spider.py'
+    # os.system(cmd)
     # from Run_Spider import run_spider
     # run_spider()
     # result = subprocess.run(command.split(),stdout=subprocess.PIPE)
