@@ -1,5 +1,4 @@
 fuzzywuzzy==0.18.0
-gramformer==1.0
 itemadapter==0.7.0
 jellyfish==0.9.0
 language_tool_python==2.7.1
@@ -10,3 +9,7 @@ Scrapy==2.8.0
 scrapy_proxy_pool==0.1.7
 streamlit==1.17.0
 tqdm==4.64.1
+torch==1.11.0 
+torchvision==0.12.0 
+torchaudio===0.11.0 
+git+https://github.com/PrithivirajDamodaran/Gramformer.git
