@@ -8,16 +8,19 @@ Created on Tue Jan 31 15:05:42 2023
 # Import packages
 
 import pandas as pd
-import language_tool_python
+# import language_tool_python
 import numpy as np
 import re
 from tqdm import tqdm
 from loguru import logger
 from fuzzywuzzy import fuzz
+from gramformer import Gramformer
+import jellyfish
 
 # Load Data
 special_char = pd.read_excel('Special characters list.xlsx',header=None)
-my_tool = language_tool_python.LanguageTool('en-US')
+# my_tool = language_tool_python.LanguageTool('en-US')
+gf = Gramformer(models=1) # 0 = detector, 1 = highlighter, 2 = corrector, 3 = all
 
 ###########################################################################################################
 # Helper Functions
@@ -40,31 +43,17 @@ def sentence_case(brand_name,title,brand_present_title):
     return res
 
 ###########################################################################################################
-## Spell Check
-def spellcheck(my_text,my_tool):
-    # using the tool
-#     logger.info(my_text)  
-    # getting the matches  
-    my_matches = my_tool.check(my_text)  
-#     logger.info(my_matches)
-    # defining some variables  
-    myMistakes = []  
-    myCorrections = []  
-    startPositions = []  
-    endPositions = []  
 
-    # using the for-loop  
-    for rules in my_matches:  
-        if len(rules.replacements) > 0:  
-#             startPositions.append(rules.offset)  
-#             endPositions.append(rules.errorLength + rules.offset)  
-            myMistakes.append(my_text[rules.offset : rules.errorLength + rules.offset])  
-            myCorrections.append(rules.replacements[0])
-    if len(myMistakes)>0:
-        return 0
+def spellcheck(txt,model):
+    corrected_text = list(model.correct(txt+'.'))[0]
+    # print(corrected_text)
+    edits = jellyfish.levenshtein_distance(txt,corrected_text)
+    if edits>0:
+        flg = 0
     else:
-        return 1
-    return [myMistakes,myCorrections,startPositions,endPositions]
+        flg = 1
+    # print([flg,edits,corrected_text])
+    return [flg,edits,corrected_text]
     
 ###########################################################################################################
 ## Special Character Check
@@ -79,13 +68,14 @@ def special_char_check(x):
 def get_Title_flag(data):
     ## Brand Name Present
     bn_check = lambda x,y:1 if y.split(' ')[0].strip().lower()==x.strip().lower() else 0
-    data['title_brand_present'] = data[['product_brand','product_title']].apply(lambda x:bn_check(x.brand_name,x.title),axis = 1)
+    data['title_brand_present'] = data[['product_brand','product_title']].apply(lambda x:bn_check(x.product_brand,x.product_title),axis = 1)
 
     ## Sentence Case
-    data['title_sentence_case'] = data[['product_brand','product_title',"title_brand_present"]].apply(lambda x:sentence_case(x.brand_name,x.title,x.title_brand_present),axis = 1)
+    data['title_sentence_case'] = data[['product_brand','product_title',"title_brand_present"]].apply(lambda x:sentence_case(x.product_brand,x.product_title,x.title_brand_present),axis = 1)
 
     ## Spell Check
-    data['title_spellcheck'] = data['product_title'].progress_apply(lambda x:spellcheck(x,my_tool))
+    # data['title_spellcheck_res'] = data['product_title'].progress_apply(lambda x:spellcheck(x,gf))
+    data[['title_spellcheck','title_Levenshtein_Distance','title_Corrected_text']] =  pd.DataFrame(data['product_title'].apply(lambda x: spellcheck(x,gf)).tolist())
     data['final_title_check_flag'] = data[['title_brand_present','title_sentence_case','title_spellcheck']].product(axis = 1)
     return data['final_title_check_flag']
 
@@ -109,7 +99,8 @@ def get_Description_flag(data):
     
     data['description_multiline_check'] = data['description'].apply(lambda x:multiline_check(x))
     ## Spell Check 
-    data['description_spellcheck'] = data['description'].progress_apply(lambda x:spellcheck(x,my_tool))
+    # data['description_spellcheck'] = data['description'].progress_apply(lambda x:spellcheck(x,gf))
+    data[['description_spellcheck','description_Levenshtein_Distance','description_Corrected_text']] =  pd.DataFrame(data['description'].apply(lambda x: spellcheck(x,gf)).tolist())
     ## Final Description check Flag
     data['final_description_check_flag'] = data[['description_special_chr_check','description_char_constrained_2000','description_multiline_check','description_spellcheck']].product(axis = 1)
 
@@ -121,11 +112,12 @@ def get_BulletPoints_flag(data):
     ## Special Character check
     data['bullets_special_chr_check'] = data['product_bullets'].apply(lambda x:special_char_check(x))
     ## Number of bullet points check (atleast 3 points)
-    data['bullets_number_check'] = data['product_bullets'].progress_apply(lambda x:1 if x.count('\n')>=2 else 0)
+    data['bullets_number_check'] = data['product_bullets'].apply(lambda x:1 if x.count('\n')>=2 else 0)
     ## Bullet Points start with capital letter check
     data['bullets_first_capital_check'] = data['product_bullets'].apply(lambda x: int(''.join([s[0] for s in x.split('\n')]).isupper()) )
     ## Spell Check
-    data['bullets_spellcheck'] = data['product_bullets'].progress_apply(lambda x:spellcheck(x,my_tool))
+    # data['bullets_spellcheck'] = data['product_bullets'].progress_apply(lambda x:spellcheck(x,gf))
+    data[['bullets_spellcheck','bullets_Levenshtein_Distance','bullets_Corrected_text']] =  pd.DataFrame(data['product_bullets'].apply(lambda x: spellcheck(x,gf)).tolist())
     ## Final Bullet Points check Flag
     data['final_bullet_point_check_flag'] = data[['bullets_special_chr_check','bullets_number_check','bullets_first_capital_check','bullets_spellcheck']].product(axis = 1)
 
@@ -216,9 +208,9 @@ def get_dimensions(text):
         multi_units_value.append(qc_res[1])
     return [1,same_unit_in_dim,check_values(multi_units_value)]
             
-data['complete_data'] = data['title']+data['description']+data['bullet_points']#+
 def get_Dimensions_flag(data):
-    data['dimensionality_inter_check'] = data['complete_data'].progress_apply(lambda x: get_dimensions(x))
+    data['complete_data'] = data['title']+data['description']+data['bullet_points']#+
+    data['dimensionality_inter_check'] = data['complete_data'].apply(lambda x: get_dimensions(x))
     return data['dimensionality_inter_check']
 
 ###########################################################################################################
@@ -230,16 +222,27 @@ def get_SentenceCase_flag(data):
 ##############################################################################################################
 ## Get all the flags
 def QC_check1(data):
-    data['final_title_check_flag'] = get_Title_flag(data.copy())
+    logger.info('Title Check Started')
+    data['final_title_check_flag'] = get_Title_flag(data)
+    logger.info('Title Check Completed!!!')
 
-    data['final_description_check_flag'] = get_Description_flag(data.copy())
+    logger.info('Description Check Started')
+    data['final_description_check_flag'] = get_Description_flag(data)
+    logger.info('Description Check Completed!!!')
 
-    data['final_bullet_point_check_flag'] = get_BulletPoints_flag(data.copy())
+    logger.info('Bullet Points Check Started')
+    data['final_bullet_point_check_flag'] = get_BulletPoints_flag(data)
+    logger.info('Bullet Points Check Completed!!!')
 
+    logger.info('Entile Spell Check Check Started')
     data['final_entire_spellcheck'] = get_SpellCheck_flag(data.copy())
+    logger.info('Entile Spell Check Completed!!!')
 
+    logger.info('Dimensionality Check Started')
     data['dimensionality_inter_check'] = get_Dimensions_flag(data.copy())
+    logger.info('Dimensionality Check Completed!!!')
 
+    logger.info('Sentence Case Check Started')
     data['final_sentence_case_check'] = get_SentenceCase_flag(data.copy())
-
+    logger.info('Sentence Case Check Completed!!!')
     return data

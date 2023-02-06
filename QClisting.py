@@ -3,9 +3,7 @@ import numpy as np
 import os
 import streamlit as st
 import pickle as pkl
-
 import subprocess
-
 import json
 import scrapy
 from scrapy.crawler import CrawlerProcess,CrawlerRunner
@@ -14,7 +12,7 @@ import re
 import sys
 sys.path.append('/QClisting')
 from loguru import  logger
-
+import excel_checks
 
 
 st.set_page_config(
@@ -66,21 +64,12 @@ def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
 
-
-# command = 'python AmazonSearchProductSpider\spiders\__init__.py'
 if submit:
     st.session_state["Brand_name"] = brand_name
     st.write("Scraping Started for {} ".format(brand_name))
-    # cmd ='python AmazonSearchProductSpider/spiders/__init__.py'
-    # os.system(cmd)
     import subprocess
     variable = 'Run_Spider.py'
     subprocess.call(f"{sys.executable} " + variable, shell=True)
-    # cmd ='python Run_Spider.py'
-    # os.system(cmd)
-    # from Run_Spider import run_spider
-    # run_spider()
-    # result = subprocess.run(command.split(),stdout=subprocess.PIPE)
     try:
         df = pd.read_csv('DataStore/Scrapy_Res.csv')
     except:
@@ -88,9 +77,13 @@ if submit:
     listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',
     'product_rating_count','country_of_origin','product_weight','product_material','product_category','item_height','item_length','item_width','aplus','description']
     df = df[listing_cols]
-    st.dataframe(df)
     st.write('Scraping Complete!!!')
     # st.write(os.listdir('DataStore/'))
+    st.write('OC_Checks Started')
+    res_df = excel_checks.QC_check1(df)
+    st.write('QC Checks Completed!!!')
+    st.dataframe(res_df)
+    
     if 'ScrapedData_pg_v1.csv' in os.listdir('DataStore/'):
         # st.write('TRUE')
         overall_data = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
@@ -98,10 +91,11 @@ if submit:
         # st.write('FALSE')
         overall_data = pd.DataFrame(columns=listing_cols)
     overall_data_new = pd.concat([df,overall_data])
+
     # st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
     # st.write('Overall Data Size is {}'.format(overall_data_new.shape))
     overall_data_new.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
-    csv = convert_df(df)
+    csv = convert_df(res_df)
     st.download_button(
         label="Download",
         data=csv,
