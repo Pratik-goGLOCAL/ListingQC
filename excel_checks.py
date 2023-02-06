@@ -18,7 +18,7 @@ from gramformer import Gramformer
 import jellyfish
 
 # Load Data
-special_char = pd.read_excel('Special characters list.xlsx',header=None)
+special_char = pd.read_csv('Special characters list.csv')
 # my_tool = language_tool_python.LanguageTool('en-US')
 gf = Gramformer(models=1) # 0 = detector, 1 = highlighter, 2 = corrector, 3 = all
 
@@ -58,7 +58,7 @@ def spellcheck(txt,model):
 ###########################################################################################################
 ## Special Character Check
 def special_char_check(x):
-    if len(set(special_char[0])) - len(set(special_char[0].tolist())-set(x))>0:
+    if len(set(special_char['chars'])) - len(set(special_char['chars'].tolist())-set(x))>0:
         return 0
     else:
         return 1
