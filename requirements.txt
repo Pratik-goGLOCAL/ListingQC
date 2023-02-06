@@ -13,4 +13,5 @@ torch==1.11.0
 torchvision==0.12.0 
 torchaudio===0.11.0 
 git+https://github.com/PrithivirajDamodaran/Gramformer.git
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.5/en_core_web_sm-2.2.5.tar.gz
+spacy>=2.2.0,<3.0.0
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.0/en_core_web_sm-2.2.0.tar.gz#egg=en_core_web_sm
