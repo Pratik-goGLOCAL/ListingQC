@@ -14,13 +14,14 @@ import re
 from tqdm import tqdm
 from loguru import logger
 from fuzzywuzzy import fuzz
-from gramformer import Gramformer
-import jellyfish
-
+# from gramformer import Gramformer
+# import jellyfish
+from gingerit.gingerit import GingerIt
 # Load Data
 special_char = pd.read_csv('Special characters list.csv')
 # my_tool = language_tool_python.LanguageTool('en-US')
-gf = Gramformer(models=1) # 0 = detector, 1 = highlighter, 2 = corrector, 3 = all
+# gf = Gramformer(models=1) # 0 = detector, 1 = highlighter, 2 = corrector, 3 = all
+parser = GingerIt()
 
 ###########################################################################################################
 # Helper Functions
@@ -45,15 +46,12 @@ def sentence_case(brand_name,title,brand_present_title):
 ###########################################################################################################
 
 def spellcheck(txt,model):
-    corrected_text = list(model.correct(txt+'.'))[0]
-    # print(corrected_text)
-    edits = jellyfish.levenshtein_distance(txt,corrected_text)
-    if edits>0:
+    res = model.parse(txt)
+    if len(res['corrections'])>0:
         flg = 0
     else:
         flg = 1
-    # print([flg,edits,corrected_text])
-    return [flg,edits,corrected_text]
+    return [flg,res['corrections']]
     
 ###########################################################################################################
 ## Special Character Check
@@ -75,7 +73,7 @@ def get_Title_flag(data):
 
     ## Spell Check
     # data['title_spellcheck_res'] = data['product_title'].progress_apply(lambda x:spellcheck(x,gf))
-    data[['title_spellcheck','title_Levenshtein_Distance','title_Corrected_text']] =  pd.DataFrame(data['product_title'].apply(lambda x: spellcheck(x,gf)).tolist())
+    data[['title_spellcheck','title_Corrected_text']] =  pd.DataFrame(data['product_title'].apply(lambda x: spellcheck(x,parser)).tolist())
     data['final_title_check_flag'] = data[['title_brand_present','title_sentence_case','title_spellcheck']].product(axis = 1)
     return data['final_title_check_flag']
 
@@ -100,7 +98,7 @@ def get_Description_flag(data):
     data['description_multiline_check'] = data['description'].apply(lambda x:multiline_check(x))
     ## Spell Check 
     # data['description_spellcheck'] = data['description'].progress_apply(lambda x:spellcheck(x,gf))
-    data[['description_spellcheck','description_Levenshtein_Distance','description_Corrected_text']] =  pd.DataFrame(data['description'].apply(lambda x: spellcheck(x,gf)).tolist())
+    data[['description_spellcheck','description_Corrected_text']] =  pd.DataFrame(data['description'].apply(lambda x: spellcheck(x,parser)).tolist())
     ## Final Description check Flag
     data['final_description_check_flag'] = data[['description_special_chr_check','description_char_constrained_2000','description_multiline_check','description_spellcheck']].product(axis = 1)
 
@@ -117,7 +115,7 @@ def get_BulletPoints_flag(data):
     data['bullets_first_capital_check'] = data['product_bullets'].apply(lambda x: int(''.join([s[0] for s in x.split('\n')]).isupper()) )
     ## Spell Check
     # data['bullets_spellcheck'] = data['product_bullets'].progress_apply(lambda x:spellcheck(x,gf))
-    data[['bullets_spellcheck','bullets_Levenshtein_Distance','bullets_Corrected_text']] =  pd.DataFrame(data['product_bullets'].apply(lambda x: spellcheck(x,gf)).tolist())
+    data[['bullets_spellcheck','bullets_Corrected_text']] =  pd.DataFrame(data['product_bullets'].apply(lambda x: spellcheck(x,parser)).tolist())
     ## Final Bullet Points check Flag
     data['final_bullet_point_check_flag'] = data[['bullets_special_chr_check','bullets_number_check','bullets_first_capital_check','bullets_spellcheck']].product(axis = 1)
 
