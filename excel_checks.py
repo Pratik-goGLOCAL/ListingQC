@@ -105,6 +105,27 @@ def get_Description_flag(data):
     return data['final_description_check_flag']
 
 ###########################################################################################################
+def runGinger(txt,my_tool):
+    sentences = txt.split('. ')
+    flg = 1
+    corrections = []
+    for sentence in sentences:
+        if len(sentence)>280:
+            words = sentence.split(' ')
+            for i in range(len(words)-50):
+                sen = ' '.join(words[i:i+50])
+                parse_res = my_tool.parse(sen)
+                if len(parse_res['corrections'])>0:
+                    flg = 0
+                corrections.append(parse_res['corrections'])
+        else:
+            parse_res = my_tool.parse(sentence)
+            if len(parse_res['corrections'])>0:
+                flg = 0
+            corrections.append(parse_res['corrections'])
+    return [flg,corrections]
+        
+
 ## Get complete BulletPoints Flag
 def get_BulletPoints_flag(data):
     ## Special Character check
@@ -115,7 +136,7 @@ def get_BulletPoints_flag(data):
     data['bullets_first_capital_check'] = data['product_bullets'].apply(lambda x: int(''.join([s[0] for s in x.split('\n')]).isupper()) )
     ## Spell Check
     # data['bullets_spellcheck'] = data['product_bullets'].progress_apply(lambda x:spellcheck(x,gf))
-    data[['bullets_spellcheck','bullets_Corrected_text']] =  pd.DataFrame(data['product_bullets'].apply(lambda x: spellcheck(x,parser)).tolist())
+    data[['bullets_spellcheck','bullets_Corrected_text']] =  pd.DataFrame(data['product_bullets'].apply(lambda x: runGinger(x,parser)).tolist())
     ## Final Bullet Points check Flag
     data['final_bullet_point_check_flag'] = data[['bullets_special_chr_check','bullets_number_check','bullets_first_capital_check','bullets_spellcheck']].product(axis = 1)
 
@@ -207,7 +228,7 @@ def get_dimensions(text):
     return [1,same_unit_in_dim,check_values(multi_units_value)]
             
 def get_Dimensions_flag(data):
-    data['complete_data'] = data['title']+data['description']+data['bullet_points']#+
+    data['complete_data'] = data['product_title']+data['description']+data['product_bullets']#+
     data['dimensionality_inter_check'] = data['complete_data'].apply(lambda x: get_dimensions(x))
     return data['dimensionality_inter_check']
 

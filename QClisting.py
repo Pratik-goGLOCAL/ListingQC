@@ -79,7 +79,8 @@ if submit:
     df = df[listing_cols]
     st.write('Scraping Complete!!!')
     # st.write(os.listdir('DataStore/'))
-    st.write('OC_Checks Started')
+    st.write('QC_Checks Started')
+    df.fillna('NULL',inplace = True)
     res_df = excel_checks.QC_check1(df)
     st.write('QC Checks Completed!!!')
     st.dataframe(res_df)
