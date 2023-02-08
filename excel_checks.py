@@ -52,7 +52,26 @@ def spellcheck(txt,model):
     else:
         flg = 1
     return [flg,res['corrections']]
-    
+
+def runGinger(txt,my_tool):
+    sentences = txt.split('. ')
+    flg = 1
+    corrections = []
+    for sentence in sentences:
+        if len(sentence)>280:
+            words = sentence.split(' ')
+            for i in range(len(words)-50):
+                sen = ' '.join(words[i:i+50])
+                parse_res = my_tool.parse(sen)
+                if len(parse_res['corrections'])>0:
+                    flg = 0
+                corrections.append(parse_res['corrections'])
+        else:
+            parse_res = my_tool.parse(sentence)
+            if len(parse_res['corrections'])>0:
+                flg = 0
+            corrections.append(parse_res['corrections'])
+    return [flg,corrections]
 ###########################################################################################################
 ## Special Character Check
 def special_char_check(x):
@@ -73,7 +92,7 @@ def get_Title_flag(data):
 
     ## Spell Check
     # data['title_spellcheck_res'] = data['product_title'].progress_apply(lambda x:spellcheck(x,gf))
-    data[['title_spellcheck','title_Corrected_text']] =  pd.DataFrame(data['product_title'].apply(lambda x: spellcheck(x,parser)).tolist())
+    data[['title_spellcheck','title_Corrected_text']] =  pd.DataFrame(data['product_title'].apply(lambda x: runGinger(x,parser)).tolist())
     data['final_title_check_flag'] = data[['title_brand_present','title_sentence_case','title_spellcheck']].product(axis = 1)
     return data['final_title_check_flag']
 
@@ -98,33 +117,13 @@ def get_Description_flag(data):
     data['description_multiline_check'] = data['description'].apply(lambda x:multiline_check(x))
     ## Spell Check 
     # data['description_spellcheck'] = data['description'].progress_apply(lambda x:spellcheck(x,gf))
-    data[['description_spellcheck','description_Corrected_text']] =  pd.DataFrame(data['description'].apply(lambda x: spellcheck(x,parser)).tolist())
+    data[['description_spellcheck','description_Corrected_text']] =  pd.DataFrame(data['description'].apply(lambda x: runGinger(x,parser)).tolist())
     ## Final Description check Flag
     data['final_description_check_flag'] = data[['description_special_chr_check','description_char_constrained_2000','description_multiline_check','description_spellcheck']].product(axis = 1)
 
     return data['final_description_check_flag']
 
 ###########################################################################################################
-def runGinger(txt,my_tool):
-    sentences = txt.split('. ')
-    flg = 1
-    corrections = []
-    for sentence in sentences:
-        if len(sentence)>280:
-            words = sentence.split(' ')
-            for i in range(len(words)-50):
-                sen = ' '.join(words[i:i+50])
-                parse_res = my_tool.parse(sen)
-                if len(parse_res['corrections'])>0:
-                    flg = 0
-                corrections.append(parse_res['corrections'])
-        else:
-            parse_res = my_tool.parse(sentence)
-            if len(parse_res['corrections'])>0:
-                flg = 0
-            corrections.append(parse_res['corrections'])
-    return [flg,corrections]
-        
 
 ## Get complete BulletPoints Flag
 def get_BulletPoints_flag(data):
