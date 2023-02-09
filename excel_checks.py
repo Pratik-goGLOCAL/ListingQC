@@ -262,7 +262,8 @@ def QC_check1(data):
     logger.info('Bullet Points Check Completed!!!')
     text3.write('Bullet Points Check Completed!!!')
 
-    data['Grade1'] = data[['final_title_check_flag','final_description_check_flag','final_bullet_point_check_flag']].product(axis = 1)
+    data['Grade1'] = data[['final_title_check_flag','final_description_check_flag','final_bullet_point_check_flag']].sum(axis = 1)
+    data['Grade1'].apply(lambda x: 'A' if x==3 else('B' if x>0 else 'C'))
 
     text4 = st.empty()
     logger.info('Entile Spell Check Started')
@@ -284,5 +285,8 @@ def QC_check1(data):
     data['final_sentence_case_check'] = get_SentenceCase_flag(data.copy())
     logger.info('Sentence Case Check Completed!!!')
     text6.write('Sentence Case Check Completed!!!')
+
+    data['Grade2'] = data[['final_entire_spellcheck','dimensionality_inter_check','final_sentence_case_check']].sum(axis = 1)
+    data['Grade2'].apply(lambda x: 'A' if x==3 else('B' if x==2 else 'C'))
 
     return data
