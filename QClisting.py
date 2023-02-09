@@ -38,7 +38,7 @@ if "Market_Place" not in st.session_state:
     st.session_state["Market_Place"] = ""
 
 # Enter email to send the results on 
-r_email = st.text_input('Enter Email to get results via email', st.session_state["r_email"])
+r_email = st.text_input('Enter e-mail address to get results via mail', st.session_state["r_email"])
 
 # Select the region ,'USA','Europe','Asia'
 region = st.multiselect(label='Select Region',
