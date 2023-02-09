@@ -14,6 +14,7 @@ import re
 from tqdm import tqdm
 from loguru import logger
 from fuzzywuzzy import fuzz
+import streamlit as st
 # from gramformer import Gramformer
 # import jellyfish
 from gingerit.gingerit import GingerIt
@@ -240,27 +241,48 @@ def get_SentenceCase_flag(data):
 ##############################################################################################################
 ## Get all the flags
 def QC_check1(data):
+    text1 = st.empty()
     logger.info('Title Check Started')
+    text1.write('Title Check Started')
     data['final_title_check_flag'] = get_Title_flag(data)
     logger.info('Title Check Completed!!!')
+    text1.write('Title Check Completed!!!')
 
+    text2 = st.empty()
     logger.info('Description Check Started')
+    text2.write('Description Check Started')
     data['final_description_check_flag'] = get_Description_flag(data)
     logger.info('Description Check Completed!!!')
+    text2.write('Description Check Completed!!!')
 
+    text3 = st.empty()
     logger.info('Bullet Points Check Started')
+    text3.write('Bullet Points Check Started')
     data['final_bullet_point_check_flag'] = get_BulletPoints_flag(data)
     logger.info('Bullet Points Check Completed!!!')
+    text3.write('Bullet Points Check Completed!!!')
 
-    logger.info('Entile Spell Check Check Started')
+    data['Grade1'] = data[['final_title_check_flag','final_description_check_flag','final_bullet_point_check_flag']].product(axis = 1)
+
+    text4 = st.empty()
+    logger.info('Entile Spell Check Started')
+    text4.write('Entile Spell Check Started')
     data['final_entire_spellcheck'] = get_SpellCheck_flag(data.copy())
     logger.info('Entile Spell Check Completed!!!')
+    text4.write('Entile Spell Check Completed!!!')
 
+    text5 = st.empty()
     logger.info('Dimensionality Check Started')
+    text5.write('Dimensionality Check Started')
     data['dimensionality_inter_check'] = get_Dimensions_flag(data.copy())
     logger.info('Dimensionality Check Completed!!!')
+    text5.write('Dimensionality Check Completed!!!')
 
+    text6 = st.empty()
     logger.info('Sentence Case Check Started')
+    text6.write('Sentence Case Check Started')
     data['final_sentence_case_check'] = get_SentenceCase_flag(data.copy())
     logger.info('Sentence Case Check Completed!!!')
+    text6.write('Sentence Case Check Completed!!!')
+
     return data

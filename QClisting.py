@@ -13,7 +13,8 @@ import sys
 sys.path.append('/QClisting')
 from loguru import  logger
 import excel_checks
-
+from datetime import datetime
+from send_email import send_email
 
 st.set_page_config(
     page_title="Listing QC"
@@ -27,12 +28,17 @@ data = pd.read_csv('excel_check.csv')
 data.fillna('NULL',inplace = True)
 
 # Initialize Variables
+if "r_email" not in st.session_state:
+    st.session_state["r_email"] = ""
 if "Brand_name" not in st.session_state:
     st.session_state["Brand_name"] = ""
 if "Region" not in st.session_state:
     st.session_state["Region"] = ""
 if "Market_Place" not in st.session_state:
     st.session_state["Market_Place"] = ""
+
+# Enter email to send the results on 
+r_email = st.text_input('Enter Email to get results via email', st.session_state["r_email"])
 
 # Select the region ,'USA','Europe','Asia'
 region = st.multiselect(label='Select Region',
@@ -56,7 +62,8 @@ st.session_state['Market_Place'] = marketplace
 # Select the Brand Name
 
 brand_name = st.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
-submit = st.button("Submit")
+submitplace = st.empty()
+submit = submitplace.button("Submit",disabled=False,key='submit1')
 
 pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_list.csv',index=False)
 @st.cache
@@ -65,26 +72,40 @@ def convert_df(df):
     return df.to_csv().encode('utf-8')
 
 if submit:
+    submitplace.button("Submit",disabled=True,key='submit2')
     st.session_state["Brand_name"] = brand_name
-    st.write("Scraping Started for {} ".format(brand_name))
+    textplace = st.empty()
+    textplace.write("Scraping Started for {} ".format(brand_name))
     import subprocess
     variable = 'Run_Spider.py'
     subprocess.call(f"{sys.executable} " + variable, shell=True)
     try:
         df = pd.read_csv('DataStore/Scrapy_Res.csv')
+        df['product_brand'] = df['product_brand'].apply(lambda x:st.session_state['Brand_name'].title() if x=='NULL' else x).copy()
     except:
         df = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
+
     listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',
     'product_rating_count','country_of_origin','product_weight','product_material','product_category','item_height','item_length','item_width','aplus','description']
     df = df[listing_cols]
-    st.write('Scraping Complete!!!')
+
+    # st.dataframe(df['product_brand'])
+    textplace.write('Scraping Complete!!!')
     # st.write(os.listdir('DataStore/'))
     st.write('QC_Checks Started')
-    df.fillna('NULL',inplace = True)
+    df.fillna('NA',inplace = True)
     res_df = excel_checks.QC_check1(df)
+    res_df = res_df.drop(['product_weight','product_material','product_category','item_height','item_length','item_width'], axis = 1)
     st.write('QC Checks Completed!!!')
+    submitplace.button("Submit",disabled=False,key='submit3')
     st.dataframe(res_df)
-    
+    now = datetime.now()
+    dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
+    filename = 'Listing_QC_results_'+st.session_state['Brand_name']+'_'+dt_string+'.csv'
+    res_df.to_csv('DataStore/'+filename ,index = False)
+    if len(r_email)>0:
+        send_email(r_email,filename)
+
     if 'ScrapedData_pg_v1.csv' in os.listdir('DataStore/'):
         # st.write('TRUE')
         overall_data = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
