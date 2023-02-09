@@ -85,7 +85,7 @@ def special_char_check(x):
 ## Get complete Title Flag
 def get_Title_flag(data):
     ## Brand Name Present
-    bn_check = lambda x,y:1 if y.split(' ')[0].strip().lower()==x.strip().lower() else 0
+    bn_check = lambda x,y:1 if y.strip().lower().find(x.strip().lower())>=0 else 0
     data['title_brand_present'] = data[['product_brand','product_title']].apply(lambda x:bn_check(x.product_brand,x.product_title),axis = 1)
 
     ## Sentence Case
@@ -105,8 +105,7 @@ def get_Description_flag(data):
     ## Characters Constrained
     data['description_char_constrained_2000'] = data['description'].apply(lambda x:1 if len(x.strip())<=2000 else 0)
     ## Multiline Check
-    def multiline_check(x):
-        first_str = data['description'][3]
+    def multiline_check(first_str):
         order = "[+-]?\d+\.\d+"
         first_str = re.sub(order, '', first_str)
         lines = re.split( r'[?.!]',first_str)
