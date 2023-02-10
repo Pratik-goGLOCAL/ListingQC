@@ -106,7 +106,7 @@ if not stop and submit:
 
     # st.dataframe(df['product_brand'])
     textplace.write('Scraping Complete!!!')
-    st.write('Estimated time for completion is about {} hours'.format(str(round(len(df)*10/60,1)) if (len(df)*10)/60 >1 else str(len(df)*10)))
+    st.write('Estimated time for completion is about {} '.format(str(round(len(df)*10/60,1))+' hours' if (len(df)*10)/60 >1 else str(len(df)*10)+' minutes'))
     # st.write(os.listdir('DataStore/'))
     st.write('QC_Checks Started')
     df.fillna('NA',inplace = True)
