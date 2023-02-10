@@ -106,7 +106,9 @@ if not stop and submit:
 
     # st.dataframe(df['product_brand'])
     textplace.write('Scraping Complete!!!')
-    st.write('Estimated time for completion is about {} '.format(str(round(len(df)*10/60,1))+' hours' if (len(df)*10)/60 >1 else str(len(df)*10)+' minutes'))
+    minpdata = 2
+    timetorun = str(round(len(df)*minpdata/60,1))+' hours' if (len(df)*minpdata)/60 >1 else str(len(df)*minpdata)+' minutes'
+    st.write('Estimated time for completion is about {} '.format(timetorun))
     # st.write(os.listdir('DataStore/'))
     st.write('QC_Checks Started')
     df.fillna('NA',inplace = True)
@@ -122,7 +124,7 @@ if not stop and submit:
                     options=available_marketplaces,
                     default = ['Amazon'],disabled = False,key = 'marketplace3')
     brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = False,key = 'brandplace3')
-    st.dataframe(res_df)
+    st.dataframe(res_df[[col for col in res_df.columns if 'Corrected_text' not in col]])
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
     filename = 'Listing_QC_results_'+st.session_state['Brand_name']+'_'+dt_string+'.csv'
