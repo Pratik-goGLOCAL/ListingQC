@@ -87,6 +87,7 @@ if not stop and submit:
 
     st.session_state["Brand_name"] = brand_name
     st.write('The Scraping+Listing QC Checks are in process. PLEASE DO NOT CLOSE THE TAB')
+    st.write('To stop the process press the Stop button and refresh the page')
     textplace = st.empty()
     textplace.write("Scraping Started for {} ".format(brand_name))
     import subprocess
@@ -94,9 +95,11 @@ if not stop and submit:
     subprocess.call(f"{sys.executable} " + variable, shell=True)
     try:
         df = pd.read_csv('DataStore/Scrapy_Res.csv')
+        df.fillna('NA',inplace = True)
         df['product_brand'] = df['product_brand'].apply(lambda x:st.session_state['Brand_name'].title() if x=='NA' else x).copy()
     except:
         df = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
+        df.fillna('NA',inplace = True)
     listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',
     'product_rating_count','country_of_origin','product_weight','product_material','product_category','item_height','item_length','item_width','aplus','description']
     df = df[listing_cols]
