@@ -27,7 +27,7 @@ class AmazonSearchProductSpider(scrapy.Spider):
 
         ## Discover Product URLs
         search_products = response.css("div.s-result-item[data-component-type=s-search-result]")
-        for product in search_products[:10]:
+        for product in search_products:
             relative_url = product.css("h2>a::attr(href)").get()
             product_url = urljoin('https://www.amazon.in/', relative_url).split("?")[0]
             yield scrapy.Request(url=product_url, callback=self.parse_product_data, meta={'keyword': keyword, 'page': page})
@@ -38,9 +38,9 @@ class AmazonSearchProductSpider(scrapy.Spider):
                 '//a[has-class("s-pagination-item")][not(has-class("s-pagination-separator"))]/text()'
             ).getall()
 
-            # for page_num in available_pages:
-            #   amazon_search_url = f'https://www.amazon.com/s?k={keyword}&page={page_num}'
-            #    yield scrapy.Request(url=amazon_search_url, callback=self.discover_product_urls, meta={'keyword': keyword, 'page': page_num})
+            for page_num in available_pages:
+              amazon_search_url = f'https://www.amazon.com/s?k={keyword}&page={page_num}'
+               yield scrapy.Request(url=amazon_search_url, callback=self.discover_product_urls, meta={'keyword': keyword, 'page': page_num})
 
 
     def parse_product_data(self, response):
