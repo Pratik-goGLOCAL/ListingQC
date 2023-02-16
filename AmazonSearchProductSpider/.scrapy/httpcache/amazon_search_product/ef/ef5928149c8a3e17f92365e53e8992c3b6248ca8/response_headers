@@ -1,0 +1,17 @@
+Server: Server
+Content-Type: text/html;charset=UTF-8
+X-Amz-Rid: HZCMQS870RYDW38BZBGA
+X-Content-Type-Options: nosniff
+Content-Security-Policy: upgrade-insecure-requests;report-uri https://metrics.media-amazon.com/
+Content-Security-Policy-Report-Only: default-src 'self' blob: https: data: mediastream: 'unsafe-eval' 'unsafe-inline';report-uri https://metrics.media-amazon.com/
+Content-Encoding: gzip
+Accept-Ch-Lifetime: 86400
+Cache-Control: no-cache, no-transform
+Cache-Control: no-transform
+Accept-Ch: ect,rtt,downlink,device-memory,sec-ch-device-memory,viewport-width,sec-ch-viewport-width,dpr,sec-ch-dpr,sec-ch-ua-platform,sec-ch-ua-platform-version
+X-Xss-Protection: 1;
+Strict-Transport-Security: max-age=47474747; includeSubDomains; preload
+X-Frame-Options: SAMEORIGIN
+Date: Thu, 09 Feb 2023 12:51:34 GMT
+Vary: Accept-Encoding
+Set-Cookie: session-token="SWFamkAYFjR3rGwS6qpsznsaI5cXGtn568Jpy7cTCfe46ExbLRziRnRxNLSDuc00vDgxA+O9saxY6DhBRlUhxTEWIyz+2SkbSf/HQwdimhoI6oES8zBB0uIcVVjzyisMrJk5cQySuq+R7MxiUeHcupJxDN9PU+kekmM9ivbHipOLWW/+lUbBhCGhiZrdRUqjbF3J98Gm2ERaWPsaayP17DOJOf+liXMUf1nifYs6uwI="; Version=1; Domain=.amazon.in; Max-Age=31536000; Expires=Fri, 09-Feb-2024 12:51:34 GMT; Path=/; Secure

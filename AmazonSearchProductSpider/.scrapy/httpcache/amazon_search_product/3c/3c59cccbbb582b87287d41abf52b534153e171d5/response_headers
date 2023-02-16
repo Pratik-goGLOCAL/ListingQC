@@ -1,0 +1,21 @@
+Content-Type: text/html;charset=UTF-8
+Server: Server
+Date: Thu, 09 Feb 2023 13:29:21 GMT
+X-Amz-Rid: E2KW1S57F5T46F628334
+Set-Cookie: session-id=259-0147016-3819478; Domain=.amazon.in; Expires=Fri, 09-Feb-2024 13:29:21 GMT; Path=/; Secure
+X-Content-Type-Options: nosniff
+Content-Security-Policy: upgrade-insecure-requests;report-uri https://metrics.media-amazon.com/
+Content-Encoding: gzip
+Accept-Ch-Lifetime: 86400
+Cache-Control: no-cache, no-transform
+Cache-Control: no-transform
+Content-Security-Policy-Report-Only: default-src 'self' blob: https: data: mediastream: 'unsafe-eval' 'unsafe-inline';report-uri https://metrics.media-amazon.com/
+Accept-Ch: ect,rtt,downlink,device-memory,sec-ch-device-memory,viewport-width,sec-ch-viewport-width,dpr,sec-ch-dpr,sec-ch-ua-platform,sec-ch-ua-platform-version
+X-Xss-Protection: 1;
+Strict-Transport-Security: max-age=47474747; includeSubDomains; preload
+Vary: Content-Type,Accept-Encoding,User-Agent
+X-Frame-Options: SAMEORIGIN
+X-Cache: Miss from cloudfront
+Via: 1.1 eb30334168b977cb7e4b3fc2a751b90a.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: BOM78-P2
+X-Amz-Cf-Id: iXYBh3P3EbBpbzbHLe2IH1jOysUyM9C1DV1PZIgUaTFoEPasMCjnGA==

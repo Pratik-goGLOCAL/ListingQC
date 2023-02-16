@@ -68,6 +68,7 @@ brand_name = brandname_place.text_input("Search for a Brand Name (if multiple th
 submitplace = st.empty()
 submit = submitplace.button("Submit",disabled=False,key='submit1')
 stop = st.button('Stop')
+db = st.empty()
 pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_list.csv',index=False)
 @st.cache
 def convert_df(df):
@@ -86,35 +87,39 @@ if not stop and submit:
     brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = True,key = 'brandplace')
 
     st.session_state["Brand_name"] = brand_name
-    st.write('The Scraping+Listing QC Checks are in process. PLEASE DO NOT CLOSE THE TAB')
-    st.write('To stop the process press the Stop button and refresh the page')
+    st.caption('The Scraping+Listing QC Checks are in process. PLEASE DO NOT CLOSE THE TAB')
+    st.caption('To stop the process press the Stop button and refresh the page')
     textplace = st.empty()
-    textplace.write("Scraping Started for {} ".format(brand_name))
+    textplace.subheader("Scraping Started for {} ".format(brand_name))
     import subprocess
     variable = 'Run_Spider.py'
     subprocess.call(f"{sys.executable} " + variable, shell=True)
     try:
         df = pd.read_csv('DataStore/Scrapy_Res.csv')
-        df.fillna('NA',inplace = True)
-        df['product_brand'] = df['product_brand'].apply(lambda x:st.session_state['Brand_name'].title() if x=='NA' else x).copy()
+        df.fillna('NA',inplace = True)  
+        # df['product_brand'] = df['product_brand'].apply(lambda x:st.session_state['Brand_name'].title() if x=='NA' else x).copy()
     except:
         df = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
         df.fillna('NA',inplace = True)
-    listing_cols = ['product_url','product_asin','product_brand','product_title','product_price','product_stars','product_images','product_bullets',
-    'product_rating_count','country_of_origin','product_weight','product_material','product_category','item_height','item_length','item_width','aplus','description']
+    listing_cols = ['ASIN', 'MRP', 'aplus_images', 'aplus_text', 'attributes', 'best_sellers_rank', 'brand', 'bullets', 'collection', 'country_of_origin', 
+    'date_first_available', 'department', 'description', 'discount', 'image_links', 'important_info', 'importer', 'is_discontinued_by_manufacturer', 
+    'item_height', 'item_height_unit', 'item_length', 'item_length_unit', 'item_width', 'item_width_unit', 'material', 'metal', 'model_number', 
+    'net_quantity', 'offers', 'packaging', 'packer', 'price', 'product_path', 'ratings', 'ratings_count', 'special_offers', 'stone', 'title', 
+    'type_of_offers', 'url', 'video_links', 'warranty_type', 'weight']
     df = df[listing_cols]
 
     # st.dataframe(df['product_brand'])
-    textplace.write('Scraping Complete!!!')
+    textplace.subheader('Scraping Complete!!!')
+    # st.write(df)
     minpdata = 2
     timetorun = str(round(len(df)*minpdata/60,1))+' hours' if (len(df)*minpdata)/60 >1 else str(len(df)*minpdata)+' minutes'
-    st.write('Estimated time for completion is about {} '.format(timetorun))
+    st.caption('Estimated time for completion is about {} '.format(timetorun))
     # st.write(os.listdir('DataStore/'))
-    st.write('QC_Checks Started')
+    st.subheader('QC_Checks Started')
     df.fillna('NA',inplace = True)
     res_df = excel_checks.QC_check1(df)
-    res_df = res_df.drop(['product_weight','product_material','product_category','item_height','item_length','item_width'], axis = 1)
-    st.write('QC Checks Completed!!!')
+    # res_df = res_df.drop(['product_weight','product_material','product_category','item_height','item_length','item_width'], axis = 1)
+    st.subheader('QC Checks Completed!!!')
     submitplace.button("Submit",disabled=False,key='submit3')
     email_place.text_input('Enter e-mail address to get results via mail', st.session_state["r_email"],disabled=False,key = 'emailplace3')
     region_place.multiselect(label='Select Region',
@@ -144,7 +149,7 @@ if not stop and submit:
     # st.write('Overall Data Size is {}'.format(overall_data_new.shape))
     overall_data_new.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
     csv = convert_df(res_df)
-    st.download_button(
+    db.download_button(
         label="Download",
         data=csv,
         file_name='DataStore/'+st.session_state['Brand_name']+'_res.csv',

@@ -5,14 +5,14 @@ from scrapy.crawler import CrawlerProcess,CrawlerRunner
 from urllib.parse import urljoin
 import re
 import sys
-from AmazonSearchProductSpider.spiders import AmazonSearchProductSpider
+from AmazonSearchProductSpider.AmazonSearchProductSpider.spiders import amazon_in_crawler
 
-
+crawler = amazon_in_crawler.AmazonSearchProductSpider
 process = CrawlerProcess(settings={
 "FEEDS": {
     "DataStore/Scrapy_Res.csv": {"format": "csv","overwrite":True},
 }
 })
 #,"overwrite":True
-process.crawl(AmazonSearchProductSpider)
+process.crawl(crawler)
 process.start()
