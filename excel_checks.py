@@ -65,6 +65,8 @@ def runGinger(txt,my_tool):
                 sen = ' '.join(words[i:i+50])
                 parse_res = my_tool.parse(sen)
                 if len(parse_res['corrections'])>0:
+                    # for corr in parse_res['corrections']:
+                    # if corr['definition']!='Accept p'
                     flg = 0
                 corrections.append(parse_res['corrections'])
         else:
@@ -228,8 +230,8 @@ def get_dimensions(text):
             
 def get_Dimensions_flag(data):
     data['complete_data'] = data['product_title']+data['description']+data['product_bullets']#+
-    data['dimensionality_inter_check'] = data['complete_data'].apply(lambda x: get_dimensions(x))
-    return data['dimensionality_inter_check']
+    data[['final_dimensionality_check','same_unit_in_dim','dimensionality_inter_check']] = data['complete_data'].apply(lambda x: get_dimensions(x))
+    return data[['final_dimensionality_check','same_unit_in_dim','dimensionality_inter_check']]
 
 ###########################################################################################################
 ## Get complete Spell Check Flag
@@ -274,7 +276,7 @@ def QC_check1(data):
     text5 = st.empty()
     logger.info('Dimensionality Check Started')
     text5.write('Dimensionality Check Started')
-    data['dimensionality_inter_check'] = get_Dimensions_flag(data.copy())
+    data[['final_dimensionality_check','same_unit_in_dim','dimensionality_inter_check']] = get_Dimensions_flag(data.copy())
     logger.info('Dimensionality Check Completed!!!')
     text5.write('Dimensionality Check Completed!!!')
 
@@ -285,7 +287,7 @@ def QC_check1(data):
     logger.info('Sentence Case Check Completed!!!')
     text6.write('Sentence Case Check Completed!!!')
 
-    data['Grade2'] = data[['final_entire_spellcheck','dimensionality_inter_check','final_sentence_case_check']].sum(axis = 1)
+    data['Grade2'] = data[['final_entire_spellcheck','final_dimensionality_check','final_sentence_case_check']].sum(axis = 1)
     data['Grade2'] = data['Grade2'].apply(lambda x: 'A' if x==3 else('B' if x==2 else 'C'))
 
     return data
