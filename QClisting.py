@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 import streamlit as st
-import pickle as pkl
+import pickle
+# import pickle as pkl
 import subprocess
 import json
 import scrapy
@@ -27,6 +28,7 @@ st.title("Listing QC")
 data = pd.read_csv('excel_check.csv')
 data.fillna('NULL',inplace = True)
 
+
 # Initialize Variables
 if "r_email" not in st.session_state:
     st.session_state["r_email"] = ""
@@ -36,7 +38,10 @@ if "Region" not in st.session_state:
     st.session_state["Region"] = ""
 if "Market_Place" not in st.session_state:
     st.session_state["Market_Place"] = ""
-
+if "asin_brand" not in st.session_state:
+    st.session_state["asin_brand"] = ""
+if "ASIN" not in st.session_state:
+    st.session_state["ASIN"] = ""
 # Enter email to send the results on 
 email_place = st.empty()
 r_email = email_place.text_input('Enter e-mail address to get results via mail', st.session_state["r_email"])
@@ -62,14 +67,33 @@ marketplace = marketplace_place.multiselect(label='Select Market Places',
 # st.write('The options selected are:', marketplace)
 st.session_state['Market_Place'] = marketplace
 
+asin_brand_place = st.empty()
+asin_brand = asin_brand_place.selectbox(label='Select ASIN or Brand',
+                    options=['Brand Name','ASIN'],disabled=False)
+# st.write('The options selected are:', marketplace)
+st.session_state['asin_brand'] = asin_brand
+logger.info(st.session_state['asin_brand'])
 # Select the Brand Name
-brandname_place = st.empty()
-brand_name = brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
+if st.session_state['asin_brand']=='ASIN':
+    asin_place = st.empty()
+    search_text = asin_place.text_input("Search for an ASIN", st.session_state["ASIN"])
+    # logger.info([x.strip() for x in search_text.split(',')])
+    
+    st.session_state["ASIN"] = search_text #[x.strip() for x in search_text.split(',')]
+else:
+    brandname_place = st.empty()
+    search_text = brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
+    
+    st.session_state["Brand_name"] =search_text #[x.strip() for x in search_text.split(',')]
 submitplace = st.empty()
 submit = submitplace.button("Submit",disabled=False,key='submit1')
 stop = st.button('Stop')
 db = st.empty()
-pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_list.csv',index=False)
+# pd.DataFrame([brand_name],columns=['keyword_list']).to_csv('DataStore/keyword_list.csv',index=False)
+keyword_list = {st.session_state['asin_brand']:search_text}
+logger.info(keyword_list)
+with open('DataStore/keyword_list.pickle', 'wb') as handle:
+    pickle.dump(keyword_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 @st.cache
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -84,13 +108,16 @@ if not stop and submit:
     marketplace_place.multiselect(label='Select Market Places',
                     options=available_marketplaces,
                     default = ['Amazon'],disabled = True,key = 'marketplace')
-    brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = True,key = 'brandplace')
-
-    st.session_state["Brand_name"] = brand_name
+    
+    if st.session_state['asin_brand']=='ASIN':
+        asin_place.text_input("Search for an ASIN", st.session_state["ASIN"],disabled = True,key = 'asinplace')
+    else:
+        brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = True,key = 'brandplace')
+    
     st.caption('The Scraping+Listing QC Checks are in process. PLEASE DO NOT CLOSE THE TAB')
     st.caption('To stop the process press the Stop button and refresh the page')
     textplace = st.empty()
-    textplace.subheader("Scraping Started for {} ".format(brand_name))
+    textplace.subheader("Scraping Started for {} ".format(search_text))
     import subprocess
     variable = 'Run_Spider.py'
     subprocess.call(f"{sys.executable} " + variable, shell=True)
@@ -101,11 +128,8 @@ if not stop and submit:
     except:
         df = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
         df.fillna('NA',inplace = True)
-    listing_cols = ['ASIN', 'MRP', 'aplus_images', 'aplus_text', 'attributes', 'best_sellers_rank', 'brand', 'bullets', 'collection', 'country_of_origin', 
-    'date_first_available', 'department', 'description', 'discount', 'image_links', 'important_info', 'importer', 'is_discontinued_by_manufacturer', 
-    'item_height', 'item_height_unit', 'item_length', 'item_length_unit', 'item_width', 'item_width_unit', 'material', 'metal', 'model_number', 
-    'net_quantity', 'offers', 'packaging', 'packer', 'price', 'product_path', 'ratings', 'ratings_count', 'special_offers', 'stone', 'title', 
-    'type_of_offers', 'url', 'video_links', 'warranty_type', 'weight']
+    listing_cols = ['ASIN', 'MRP', 'aplus_images', 'aplus_text', 'brand', 'bullets', 'description', 'image_links',
+                    'price', 'ratings', 'ratings_count', 'title', 'url', 'video_links']
     df = df[listing_cols]
 
     # st.dataframe(df['product_brand'])
@@ -128,8 +152,13 @@ if not stop and submit:
     marketplace_place.multiselect(label='Select Market Places',
                     options=available_marketplaces,
                     default = ['Amazon'],disabled = False,key = 'marketplace3')
-    brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = False,key = 'brandplace3')
-    st.dataframe(res_df[[col for col in res_df.columns if 'Corrected_text' not in col]])
+    if st.session_state['asin_brand']=='ASIN':
+        asin_place.text_input("Search for an ASIN", st.session_state["ASIN"],disabled = False,key = 'asinplace3')
+    else:
+        brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = False,key = 'brandplace3')
+    # st.dataframe(res_df[[col for col in res_df.columns if 'Corrected_text' not in col]])
+    st.dataframe(res_df)
+
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
     filename = 'Listing_QC_results_'+st.session_state['Brand_name']+'_'+dt_string+'.csv'
@@ -137,17 +166,17 @@ if not stop and submit:
     if len(r_email)>0:
         send_email(r_email,filename)
 
-    if 'ScrapedData_pg_v1.csv' in os.listdir('DataStore/'):
-        # st.write('TRUE')
-        overall_data = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
-    else:
-        # st.write('FALSE')
-        overall_data = pd.DataFrame(columns=listing_cols)
-    overall_data_new = pd.concat([df,overall_data])
+    # if 'ScrapedData_pg_v1.csv' in os.listdir('DataStore/'):
+    #     # st.write('TRUE')
+    #     overall_data = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
+    # else:
+    #     # st.write('FALSE')
+    #     overall_data = pd.DataFrame(columns=listing_cols)
+    # overall_data_new = pd.concat([df,overall_data])
 
     # st.write('Total {} unique product Asin found, Data Size: {}'.format(df['product_asin'].nunique(),df.shape))
     # st.write('Overall Data Size is {}'.format(overall_data_new.shape))
-    overall_data_new.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
+    # overall_data_new.to_csv('DataStore/ScrapedData_pg_v1.csv',index=False)
     csv = convert_df(res_df)
     db.download_button(
         label="Download",

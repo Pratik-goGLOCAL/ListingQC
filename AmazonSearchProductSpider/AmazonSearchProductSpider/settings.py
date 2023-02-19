@@ -20,17 +20,19 @@ ROBOTSTXT_OBEY = True
 
 #HTTPCACHE_ENABLED = True
 DOWNLOAD_DELAY =5
-AUTOTHROTTLE_ENABLED = True
+#AUTOTHROTTLE_ENABLED = True
 #PROXY_POOL_ENABLED = True
 #USER_AGENT ="https://developers.whatismybrowser.com/useragents/parse/79-googlebot"
 DUPEFILTER_CLASS = 'scrapy.dupefilters.BaseDupeFilter'
-
+RETRY_HTTP_CODES=[503]
 DOWNLOADER_MIDDLEWARES = {
     # ...
     #'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,
     #'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
-    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+    #'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    #'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
     #'AmazonSearchProductSpider.middlewares.AmazonSearchProductSpiderDownloaderMiddleware': 543,
 
     # ...
@@ -52,11 +54,16 @@ PROXIES=["https://116.202.165.119:3124",
          "http://150.129.201.30:6666",
          "http://45.248.138.150:8080",
          "http://49.249.155.3:80",
-         "http://103.24.20.208:80",
+         "http://103.24.20.208:80",#WORKING
          "http://115.96.208.124:8080",
         ]
+
+SPIDER_MIDDLEWARES = {
+        'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware': None,
+        'AmazonSearchProductSpider.middlewares.MyHttpErrorMiddleware': 540,
+}
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay

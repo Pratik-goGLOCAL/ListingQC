@@ -12,7 +12,8 @@ import subprocess
 from scrapy.utils.project import get_project_settings
 import pandas as pd
 from loguru import logger
-
+from fake_headers import Headers
+import pickle
 
 def get_useragent():
     software_names = [SoftwareName.FIREFOX.value]
@@ -25,34 +26,50 @@ class AmazonSearchProductSpider(scrapy.Spider):
     def start_requests(self):
         self.count = 1
         referer = ['https://www.amazon.in/','https://www.google.com/'] 
-        accept_language=['en-US,en;q=0.9','en-US,en;q=0.5']
-        headers = {
-                    #'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
-                    'User-Agent':str(get_useragent()),
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                    'Accept-Language': 'en-US,en;q=0.5',
-                    # 'Accept-Encoding': 'gzip, deflate, br',
-                    'Referer': 'https://www.amazon.in/',
-                    'Connection': 'keep-alive',
-                    # 'Cookie': 'csm-hit=tb:s-48QJ21H8J6KYDPY7J937^|1675945452378&t:1675945456757&adb:adblk_no; session-id=262-2212382-0804152; session-id-time=2082787201l; i18n-prefs=INR; ubid-acbin=261-4314748-8549618; session-token=I3N1k38yT0bQaCYGfjOVgmwyl9MjfNAq3DqE2ifXc15frlhetp6vd3rQj3ng1DcUIeDNWzwCYRtckv//ArsuJtqGHYpGe+WtqgTUFWW2qzBLZDsNPbZgbhmDPb2llbJZZaZH/2el1UbGv1VvDh4G4MM8s39uzv5zJuo8pVd2bCPGnPIF1nPzlRYmgpnAKuMLYdN6KLOvfKO4s9VVjBOnfuTfBt48rDpKQUqgpujNm1I=; lc-acbin=en_IN; x-amz-captcha-1=1675593858520175; x-amz-captcha-2=cQ6u/sOJP8l6xoAR904v0w==',
-                    'Upgrade-Insecure-Requests': '1',
-                    'Sec-Fetch-Dest': 'document',
-                    'Sec-Fetch-Mode': 'navigate',
-                    'Sec-Fetch-Site': 'same-origin',
-                    'Sec-Fetch-User': '?1',
-                    # Requests doesn't support trailers
-                    # 'TE': 'trailers',
-                }
+        headers_list =[ {
+                     #'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0',
+                     'User-Agent':str(get_useragent()),
+                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                     'Accept-Language': 'en-US,en;q=0.5',
+                     # 'Accept-Encoding': 'gzip, deflate, br',
+                     'Referer':str(random.choice(referer)),
+                     'Connection': 'keep-alive',
+                     # 'Cookie': 'csm-hit=tb:s-CVCTDANP0CKXCSY9NDXE^|1676547049593&t:1676547053266&adb:adblk_no; session-id=262-2212382-0804152; session-id-time=2082787201l; i18n-prefs=INR; ubid-acbin=261-4314748-8549618; session-token=k4trh6fRrQZghhoHckc0RTdcLzlQM+l2ILP8166Lb5Baq0XNwl6SkocgFcAxJ4+L3PPs0x6ph6/GeazIfcLdEovbwg+xS73feZ4SAISjWD1cp88d1qx6/2IafpbZERh+FWFJEgIbM6G9LXEbyEmCyW+OILdQSAWbdgKI629fSzpa0+O9lkFZpfRjsTKTnfLBrsmmggwxEyWzQ6lyNHIpmZ38vFP0tOVpcN+G8950wMA=; lc-acbin=en_IN; x-amz-captcha-1=1675593858520175; x-amz-captcha-2=cQ6u/sOJP8l6xoAR904v0w==',
+                     'Upgrade-Insecure-Requests': '1',
+                     'Sec-Fetch-Dest': 'document',
+                     'Sec-Fetch-Mode': 'navigate',
+                     'Sec-Fetch-Site': 'same-origin',
+                     'Sec-Fetch-User': '?1'
+                     # Requests doesn't support trailers
+                     # 'TE': 'trailers',
+                  } ,
+                  Headers(headers=True).generate()
+                ]          
 
-        keyword_list = [pd.read_csv('DataStore/keyword_list.csv')['keyword_list'][0]]
-        logger.info('The Selected keyword List in {}'.format(keyword_list))
-        for keyword in keyword_list:
-            amazon_search_url = f'https://www.amazon.in/s?k={keyword}&page=1'
-            yield scrapy.Request(url=amazon_search_url, 
-                                 callback=self.discover_product_urls, 
-                                 meta={'keyword': keyword, 'page': 1},
-                                 headers=headers
-                                )
+        with open('DataStore/keyword_list.pickle', 'rb') as handle:
+            keyword_list = pickle.load(handle)
+        logger.info('Keyword List before is {}'.format(keyword_list.values()))
+        logger.info('Keyword List contains "," {}'.format(',' in list(keyword_list.values())[0]))
+        if ',' in list(keyword_list.values())[0]:
+            logger.info(keyword_list.values())
+            search_text =  [x.strip() for x in list(keyword_list.values())[0].split(',')]
+        else:
+            logger.info(list(keyword_list.values()))
+            search_text = list(keyword_list.values())
+        if 'ASIN' in keyword_list.keys():
+            for asin in search_text:
+                amazon_search_url = f'https://www.amazon.in/dp/'+str(asin)
+                yield scrapy.Request(url=amazon_search_url, 
+                                    callback=self.parse_product_data,
+                                    headers=random.choice(headers_list))
+        else:
+            for keyword in search_text:
+                logger.info('Keyword is {}'.format(keyword))
+                amazon_search_url = f'https://www.amazon.in/s?k={keyword}&page=1'
+                yield scrapy.Request(url=amazon_search_url, 
+                                    callback=self.discover_product_urls, 
+                                    meta={'keyword': keyword, 'page': 1,},
+                                    headers=random.choice(headers_list))
 
     def discover_product_urls(self, response):
         page = response.meta['page']
