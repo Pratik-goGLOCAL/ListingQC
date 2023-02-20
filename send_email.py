@@ -8,7 +8,7 @@ with open('DataStore/keyword_list.pickle', 'rb') as handle:
     keyword_list = pickle.load(handle)
 
 resfor = list(keyword_list.keys())[0]
-names = list(keyword_list.values())[0]
+names = list(keyword_list.values())
 subject_for_email = 'Listing QC Results for '+resfor
 body_for_email = '''Hello,
 

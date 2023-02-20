@@ -161,7 +161,7 @@ if not stop and submit:
 
     now = datetime.now()
     dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
-    filename = 'Listing_QC_results_'+st.session_state['Brand_name']+'_'+dt_string+'.csv'
+    filename = 'Listing_QC_results_'+dt_string+'.csv'
     res_df.to_csv('DataStore/'+filename ,index = False)
     if len(r_email)>0:
         send_email(r_email,filename)
