@@ -4,19 +4,21 @@ import os
 import pickle
 import pandas as pd
 
-with open('DataStore/keyword_list.pickle', 'rb') as handle:
-            keyword_list = pickle.load(handle)
 
-tag = list(keyword_list.keys())[0]
-names = list(keyword_list.values())
-email_subject = 'Listing QC Results for '+ tag
-email_body = '''Hello,
+# names = list(keyword_list.values())
 
-        The Listing QC check is sucessfully completed for {}!!!
-        The results are attached with this mail.
-        
-        Thanks'''.format(names)
 def send_email(r_email,filename):
+    with open('DataStore/keyword_list.pickle', 'rb') as handle:
+        keyword_list = pickle.load(handle)
+    tag = list(keyword_list.keys())[0]
+    names = pd.read_csv('DataStore/'+filename)['ASIN'].tolist()
+    email_subject = 'Listing QC Results for '+ tag
+    email_body = '''Hello,
+
+            The Listing QC check is sucessfully completed for {}!!!
+            The results are attached with this mail.
+            
+            Thanks'''.format(names)
     # Create SendMail object
     new_mail = SendMail(
         # List (or string if single recipient) of the email addresses of the recipients
