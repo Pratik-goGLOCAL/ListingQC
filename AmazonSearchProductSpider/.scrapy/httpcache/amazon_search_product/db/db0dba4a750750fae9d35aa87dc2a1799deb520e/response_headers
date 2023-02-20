@@ -1,0 +1,23 @@
+Server: Server
+Date: Fri, 03 Feb 2023 08:26:44 GMT
+Content-Type: text/html;charset=UTF-8
+X-Frame-Options: SAMEORIGIN
+X-Amz-Rid: 0N9WBJHBTJ4KP2N29NFJ
+Set-Cookie: session-id=260-9361758-9432112; Domain=.amazon.in; Expires=Sat, 03-Feb-2024 08:26:44 GMT; Path=/; Secure
+Set-Cookie: session-id-time=2082787201l; Domain=.amazon.in; Expires=Sat, 03-Feb-2024 08:26:44 GMT; Path=/; Secure
+Set-Cookie: i18n-prefs=INR; Domain=.amazon.in; Expires=Sat, 03-Feb-2024 08:26:44 GMT; Path=/
+Content-Encoding: gzip
+Cache-Control: no-cache
+Cache-Control: no-transform
+Content-Language: en-IN
+Pragma: no-cache
+Accept-Ch: ect,rtt,downlink,device-memory,sec-ch-device-memory,viewport-width,sec-ch-viewport-width,dpr,sec-ch-dpr,sec-ch-ua-platform,sec-ch-ua-platform-version
+Content-Security-Policy: upgrade-insecure-requests;report-uri https://metrics.media-amazon.com/
+Content-Security-Policy-Report-Only: default-src 'self' blob: https: data: mediastream: 'unsafe-eval' 'unsafe-inline';report-uri https://metrics.media-amazon.com/
+Expires: -1
+X-Xss-Protection: 1;
+Accept-Ch-Lifetime: 86400
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=47474747; includeSubDomains; preload
+Vary: Content-Type,Accept-Encoding,User-Agent
+X-Served-By: cache-maa10246-MAA

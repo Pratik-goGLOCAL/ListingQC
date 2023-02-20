@@ -1,21 +1,30 @@
 from send_mail import SendMail
 import streamlit as st
 import os
+import pickle
+import pandas as pd
 
+with open('DataStore/keyword_list.pickle', 'rb') as handle:
+            keyword_list = pickle.load(handle)
+
+tag = list(keyword_list.keys())[0]
+names = list(keyword_list.values())
+email_subject = 'Listing QC Results for '+ tag
+email_body = '''Hello,
+
+        The Listing QC check is sucessfully completed for {}!!!
+        The results are attached with this mail.
+        
+        Thanks'''.format(names)
 def send_email(r_email,filename):
     # Create SendMail object
     new_mail = SendMail(
         # List (or string if single recipient) of the email addresses of the recipients
         [r_email], 
         # Subject of the email
-        'Listing QC Results',
+        email_subject,
         # Body of the email
-        '''Hello,
-
-        The Listing QC check is sucessfully completed!!!
-        The results are attached with this mail.
-        
-        Thanks''', 
+        email_body, 
         # Email address of the sender
         # Leave this paramter out if using environment variable 'EMAIL_ADDRESS'
         'pratik.g@goglocal.com' 
@@ -25,13 +34,13 @@ def send_email(r_email,filename):
     # new_mail.add_html_file('/path/to/your/html/file')
 
     # List (or string if attaching single file) of relative or absolute file path(s) to files
-    new_mail.attach_files(['DataStore/'+filename])
+    new_mail.attach_files(['DataStore/'+filename,'DataStore/DataDict.csv'])
 
     # Print SendMail object to confirm email
     print(new_mail)
 
     # Send the email
     # Leave this parameter out if using environment variable 'EMAIL_PASSWORD'
-    new_mail.send('kzyyzehenejdxywq')
+    new_mail.send('sdqymwrluxqcytnx')
     os.remove('DataStore/'+filename)
     st.write('Resuls successfully sent to your email address!!!')

@@ -10,3 +10,7 @@ scrapy_proxy_pool==0.1.7
 send_mail==0.0.2
 streamlit==1.17.0
 tqdm==4.64.1
+stqdm
+Caribe
+random_user_agent
+fake_headers
