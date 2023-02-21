@@ -11,7 +11,10 @@ def send_email(r_email,filename):
     with open('DataStore/keyword_list.pickle', 'rb') as handle:
         keyword_list = pickle.load(handle)
     tag = list(keyword_list.keys())[0]
-    names = pd.read_csv('DataStore/'+filename)['ASIN'].tolist()
+    if tag=='ASIN':
+        names = pd.read_csv('DataStore/'+filename)['ASIN'].tolist()
+    else:
+        names = st.session_state['Brand_name']
     email_subject = 'Listing QC Results for '+ tag
     email_body = '''Hello,
 

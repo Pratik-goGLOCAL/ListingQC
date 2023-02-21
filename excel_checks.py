@@ -89,6 +89,8 @@ def spellcheck(txt,model):
 #     return [flg,corrections]
 
 def runGinger(txt,my_tool):
+    if txt=='NA':
+        return [0,['No Description'],txt]
     # logger.info(txt)
     try:
         sentences = [x.strip().lstrip(', ') for x in txt.strip().split('\n')]
@@ -141,7 +143,7 @@ def special_char_check(x):
 ## Get complete Title Flag
 def get_Title_flag(data):
     ## Brand Name Present
-    bn_check = lambda x,y:1 if y.strip().lower().find(x.strip().lower())>=0 else 0
+    bn_check = lambda x,y:1 if y.strip().lower().find(x.strip().lower())==0 else 0
 
     t1 = st.empty()
     t1.caption('Brand Check: ')
@@ -302,7 +304,7 @@ def format_dim(dim):
     for unit in re.finditer("[a-z]+",dim):
         units.append(unit.group())
     values = []
-    for val in re.finditer("[0-9]+",dim):
+    for val in re.finditer("((\d*[.])?\d+)+",dim):
         values.append(val.group())
     logger.info('unit is {} and values are {}'.format(units,values))
     return [units,values]
@@ -326,7 +328,7 @@ def check_values(value_list):
     return res
 
 def get_dimensions(text):
-    iters = re.finditer("(((\d+ ?[a-zA-Z]+ ?)[x,X] ?(\d+ ?[a-zA-Z]+ ?)[x,X] ?(\d+ ?[a-zA-Z]+ ?))|((\d+ ?[a-z]+ ?)[x,X] ?(\d+ ?[a-zA-Z]+ ?)))|(((\d+ ?)[x,X] ?(\d+ ?)[x,X] ?(\d+ ?[a-zA-Z]+))|((\d+ ?)[x,X] ?(\d+ ?[a-zA-Z]+)))",text)
+    iters = re.finditer("(((((\d*[.])?\d+) ?[a-zA-Z]+ ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?)[x,X] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?))|((((\d*[.])?\d+) ?[a-z]+ ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?)))|(((((\d*[.])?\d+) ?)[x,X,*] ?(((\d*[.])?\d+) ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+))|((((\d*[.])?\d+) ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+)))",text)
     matched_strings = []
     for i in iters:
         matched_strings.append(i.group())
