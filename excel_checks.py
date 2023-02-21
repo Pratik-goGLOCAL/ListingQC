@@ -328,7 +328,7 @@ def check_values(value_list):
     return res
 
 def get_dimensions(text):
-    iters = re.finditer("(((((\d*[.])?\d+) ?[a-zA-Z]+ ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?)[x,X] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?))|((((\d*[.])?\d+) ?[a-z]+ ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?)))|(((((\d*[.])?\d+) ?)[x,X,*] ?(((\d*[.])?\d+) ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+))|((((\d*[.])?\d+) ?)[x,X,*] ?(((\d*[.])?\d+) ?[a-zA-Z]+)))",text)
+    iters = re.finditer("(((((\d*[.])?\d+) ?[a-zA-Z]+ ?)[xX] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?)[xX] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?))|((((\d*[.])?\d+) ?[a-z]+ ?)[xX] ?(((\d*[.])?\d+) ?[a-zA-Z]+ ?)))|(((((\d*[.])?\d+) ?)[xX] ?(((\d*[.])?\d+) ?)[xX] ?(((\d*[.])?\d+) ?[a-zA-Z]+))|((((\d*[.])?\d+) ?)[xX] ?(((\d*[.])?\d+) ?[a-zA-Z]+)))",text)
     matched_strings = []
     for i in iters:
         matched_strings.append(i.group())
