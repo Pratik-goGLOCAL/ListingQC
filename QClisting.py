@@ -128,9 +128,9 @@ if not stop and submit:
     except:
         df = pd.read_csv('DataStore/ScrapedData_pg_v1.csv')
         df.fillna('NA',inplace = True)
-    listing_cols = ['ASIN', 'MRP', 'aplus_images', 'aplus_text', 'brand', 'bullets', 'description', 'image_links',
-                    'price', 'ratings', 'ratings_count', 'title', 'url', 'video_links']
-    df = df[listing_cols]
+    # listing_cols = ['ASIN', 'MRP', 'aplus_images', 'aplus_text', 'brand', 'bullets', 'description', 'image_links',
+    #                 'price', 'ratings', 'ratings_count', 'title', 'url', 'video_links']
+    df = df#[listing_cols]
 
     # st.dataframe(df['product_brand'])
     textplace.subheader('Scraping Complete!!!')

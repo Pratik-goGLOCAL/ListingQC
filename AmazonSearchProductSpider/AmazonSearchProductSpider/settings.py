@@ -11,67 +11,107 @@ BOT_NAME = 'AmazonSearchProductSpider'
 SPIDER_MODULES = ['AmazonSearchProductSpider.spiders']
 NEWSPIDER_MODULE = 'AmazonSearchProductSpider.spiders'
 
-
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'AmazonSearchProductSpider (+http://www.yourdomain.com)'
-
-# Obey robots.txt rules
 ROBOTSTXT_OBEY = True
+CONCURRENT_REQUESTS = 5
+#CONCURRENT_REQUESTS_PER_DOMAIN = 5
+#CONCURRENT_REQUESTS_PER_IP = 5
+RETRY_HTTP_CODES= [503]
+DOWNLOAD_DELAY = 5
 
-#HTTPCACHE_ENABLED = True
-DOWNLOAD_DELAY =5
-#AUTOTHROTTLE_ENABLED = True
-#PROXY_POOL_ENABLED = True
-#USER_AGENT ="https://developers.whatismybrowser.com/useragents/parse/79-googlebot"
+AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_START_DELAY = 2
+AUTOTHROTTLE_MAX_DELAY = 8
+AUTOTHROTTLE_TARGET_CONCURRENCY = 1.5
+
 DUPEFILTER_CLASS = 'scrapy.dupefilters.BaseDupeFilter'
-RETRY_HTTP_CODES=[503]
+
 DOWNLOADER_MIDDLEWARES = {
     # ...
-    #'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,
-    #'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
-    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
-    #'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+     #'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+     #'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
     #'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    #'AmazonSearchProductSpider.middlewares.AmazonSearchProductSpiderDownloaderMiddleware': 543,
-
+    #'amazon_us_toys.middlewares.ChangeProxyOn503RetryMiddleware': 543,
+    #'amazon_us_toys.middlewares.ShowStatus': 540,
     # ...
 }
-
-PROXIES=["https://116.202.165.119:3124",
-         "https://139.59.60.46:3128",
-         "http://103.215.207.38:83",
-         "http://139.59.1.14:8080",
-         "http://45.114.78.140:3128",
-         "http://103.48.68.107:83",
-         "http://164.100.131.37:80",
-         "http://164.100.131.37:8080",
-         "http://103.215.207.85:82",
-         "http://14.140.131.82:3128",
-         "http://139.59.33.166:80",
-         "http://115.241.197.126:80",
-         "http://157.119.211.133:8080",
-         "http://150.129.201.30:6666",
-         "http://45.248.138.150:8080",
-         "http://49.249.155.3:80",
-         "http://103.24.20.208:80",#WORKING
-         "http://115.96.208.124:8080",
-        ]
-
 SPIDER_MIDDLEWARES = {
+    #    'amazon_us_toys.middlewares.AmazonUsToysSpiderMiddleware': 543,
         'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware': None,
         'AmazonSearchProductSpider.middlewares.MyHttpErrorMiddleware': 540,
 }
-# Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 1
+
+#>>>>>>>>>>>>>>>>>>>>>>>HEADERS AND PROXIES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+import random
+from fake_headers import Headers
+from scrapy.spidermiddlewares.httperror import HttpErrorMiddleware
+from random_user_agent.params import SoftwareName, OperatingSystem
+from random_user_agent.user_agent import UserAgent
+import os
+def get_useragent():
+        software_names = [SoftwareName.FIREFOX.value , SoftwareName.CHROME.value]
+        operating_systems = [OperatingSystem.WINDOWS.value,OperatingSystem.MAC.value,OperatingSystem.LINUX.value]
+        user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems)
+        return user_agent_rotator.get_random_user_agent()
+
+referer = ['https://www.amazon.in/','https://www.google.com/'] 
+HEADERS = [{
+            'User-Agent': str(random.choice(get_useragent())),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            # 'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            #'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            # Requests doesn't support trailers
+            # 'TE': 'trailers',
+            }, Headers(headers=True).generate() 
+         ]  
+        
+filename = r'AmazonSearchProductSpider\AmazonSearchProductSpider\clean_proxy_list_us.txt'
+with open(filename) as file:
+    data= file.read()
+
+PROXIES =data.split("\n")
+
+import urllib.request
+import requests
+import random
+import os
+def update_roxy():
+    url = 'http://list.didsoft.com/get?email=yogesh.a@goglocal.com&pass=rp49j2&pid=http1000&showcountry=yes&https=yes&country=IN'
+    local_filename = r"AmazonSearchProductSpider\AmazonSearchProductSpider\fetched_proxy_list.txt"
+    response = requests.get(url)
+    response.raise_for_status()
+
+    with open(local_filename, 'w') as file:
+        file.write(response.content.decode('utf-8'))
+    with open(local_filename,'r') as f:
+        data = f.read()
+
+    proxies = data.split("\n")
+
+    with open(r"AmazonSearchProductSpider\AmazonSearchProductSpider\clean_proxy_list_us.txt"),'w' as f:
+            for i in proxies:
+                if i!="":
+                    f.write("https://"+i.split("#")[0]+"\n")
+    filename = r"AmazonSearchProductSpider\AmazonSearchProductSpider\clean_proxy_list_us.txt"
+    with open(filename) as file:
+        proxies = file.read()
+    print(proxies)
+    print("Proxies Updated")
+    print("random : ",random.choice(proxies.split('\n')))
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 #DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
-#CONCURRENT_REQUESTS_PER_DOMAIN = 16
-#CONCURRENT_REQUESTS_PER_IP = 16
+#CONCURRENT_REQUESTS_PER_DOMAIN = 100
+#CONCURRENT_REQUESTS_PER_IP = 100
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
