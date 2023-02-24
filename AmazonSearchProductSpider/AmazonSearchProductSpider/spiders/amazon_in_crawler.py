@@ -46,7 +46,7 @@ class AmazonSearchProductSpider(scrapy.Spider):
                 logger.info('Keyword is {}'.format(keyword))
                 amazon_search_url = f'https://www.amazon.in/s?k={keyword}&page=1'
                 yield scrapy.Request(url=amazon_search_url, 
-                                    callback=self.discover_product_urls, 
+                                    callback=self.discoveFr_product_urls, 
                                     meta={'keyword': keyword, 'page': 1,},
                                     headers=random.choice(HEADERS))
 
