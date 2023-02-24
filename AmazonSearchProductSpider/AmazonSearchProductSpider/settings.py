@@ -71,7 +71,7 @@ HEADERS = [{
             }, Headers(headers=True).generate() 
          ]  
         
-filename = r'AmazonSearchProductSpider\AmazonSearchProductSpider\clean_proxy_list_us.txt'
+filename = r'AmazonSearchProductSpider/AmazonSearchProductSpider/clean_proxy_list_us.txt'
 with open(filename) as file:
     data= file.read()
 
@@ -83,7 +83,7 @@ import random
 import os
 def update_roxy():
     url = 'http://list.didsoft.com/get?email=yogesh.a@goglocal.com&pass=rp49j2&pid=http1000&showcountry=yes&https=yes&country=IN'
-    local_filename = r"AmazonSearchProductSpider\AmazonSearchProductSpider\fetched_proxy_list.txt"
+    local_filename = r"AmazonSearchProductSpider/AmazonSearchProductSpider/fetched_proxy_list.txt"
     response = requests.get(url)
     response.raise_for_status()
 
@@ -94,11 +94,11 @@ def update_roxy():
 
     proxies = data.split("\n")
 
-    with open(r"AmazonSearchProductSpider\AmazonSearchProductSpider\clean_proxy_list_us.txt"),'w' as f:
+    with open(r"AmazonSearchProductSpider/AmazonSearchProductSpider/clean_proxy_list_us.txt"),'w' as f:
             for i in proxies:
                 if i!="":
                     f.write("https://"+i.split("#")[0]+"\n")
-    filename = r"AmazonSearchProductSpider\AmazonSearchProductSpider\clean_proxy_list_us.txt"
+    filename = r"AmazonSearchProductSpider/AmazonSearchProductSpider/clean_proxy_list_us.txt"
     with open(filename) as file:
         proxies = file.read()
     print(proxies)

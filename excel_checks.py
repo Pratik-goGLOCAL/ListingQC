@@ -350,7 +350,7 @@ def get_dimensions(text):
 def get_Dimensions_flag(data):
     dim1 = st.empty()
     dim1.caption('Dimensions Check: ')
-    data['complete_data'] = data['title']+data['description']+data['bullets']#+
+    data['complete_data'] = data['title']+'. '+ data['description']+'. '+data['bullets']#+
     data['final_dimensionality_check'] = data['complete_data'].progress_apply(lambda x: get_dimensions(x))
     messages['final_dimensionality_check'] = ['Dimensions Check Flag']
     # logger.info(data['dimension_check_res'])
