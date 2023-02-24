@@ -6,7 +6,10 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+# import os
+# from loguru import logger
 
+# logger.info('os working directory is {}'.format(os.getcwd()))
 BOT_NAME = 'AmazonSearchProductSpider'
 SPIDER_MODULES = ['AmazonSearchProductSpider.spiders']
 NEWSPIDER_MODULE = 'AmazonSearchProductSpider.spiders'
@@ -37,7 +40,7 @@ DOWNLOADER_MIDDLEWARES = {
 SPIDER_MIDDLEWARES = {
     #    'amazon_us_toys.middlewares.AmazonUsToysSpiderMiddleware': 543,
         'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware': None,
-        'AmazonSearchProductSpider.middlewares.MyHttpErrorMiddleware': 540,
+        'AmazonSearchProductSpider.AmazonSearchProductSpider.middlewares.MyHttpErrorMiddleware': 540,
 }
 
 #>>>>>>>>>>>>>>>>>>>>>>>HEADERS AND PROXIES<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -70,11 +73,12 @@ HEADERS = [{
             # 'TE': 'trailers',
             }, Headers(headers=True).generate() 
          ]  
-        
+
+# logger.info('THis is running')
 filename = r'AmazonSearchProductSpider/AmazonSearchProductSpider/clean_proxy_list_us.txt'
 with open(filename) as file:
     data= file.read()
-
+# logger.info('clean proxy text = {}'.format(data))
 PROXIES =data.split("\n")
 
 import urllib.request
@@ -101,6 +105,7 @@ def update_roxy():
     filename = r"AmazonSearchProductSpider/AmazonSearchProductSpider/clean_proxy_list_us.txt"
     with open(filename) as file:
         proxies = file.read()
+    
     print(proxies)
     print("Proxies Updated")
     print("random : ",random.choice(proxies.split('\n')))

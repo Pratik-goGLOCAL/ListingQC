@@ -11,7 +11,7 @@ from scrapy.crawler import CrawlerProcess,CrawlerRunner
 from urllib.parse import urljoin
 import re
 import sys
-sys.path.append('/QClisting')
+# sys.path.append('/ListingQC')
 from loguru import  logger
 import excel_checks
 from datetime import datetime

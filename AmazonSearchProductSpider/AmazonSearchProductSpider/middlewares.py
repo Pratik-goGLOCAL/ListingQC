@@ -12,14 +12,15 @@ from scrapy.spidermiddlewares.httperror import HttpErrorMiddleware
 from random_user_agent.params import SoftwareName, OperatingSystem
 from random_user_agent.user_agent import UserAgent
 import logging
-from fp.fp import FreeProxy
+# from fp.fp import FreeProxy
 import random
 
 class MyHttpErrorMiddleware(HttpErrorMiddleware):
-
+    logging.info('Now LOADING')
     def process_spider_exception(self, response, exception, spider):
         print("Inside exception ",response.status)
         if response.status==503:
+            logging.info('Enter the Dragon!!')
             proxy =random.choice(PROXIES)
             headers =random.choice(HEADERS)
             print(f"Using PROXY : {proxy} for {response.request.url}")
