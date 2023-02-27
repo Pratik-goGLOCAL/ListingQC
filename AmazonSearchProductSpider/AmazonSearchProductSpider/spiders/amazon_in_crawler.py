@@ -97,7 +97,7 @@ class AmazonSearchProductSpider(scrapy.Spider):
         #image_data = json.loads(re.findall(r"colorImages':.*'initial':\s*(\[.+?\])},\n", response.text)[0])
         #variant_data = re.findall(r'dimensionValuesDisplayData"\s*:\s* ({.+?}),\n', response.text)
         
-        feature_bullets = [bullet for bullet in response.css("#feature-bullets li ::text").getall()]
+        feature_bullets = [bullet+'\n' for bullet in response.css("#feature-bullets li ::text").getall()]
         img_links =response.css("#altImages img::attr(src)").getall()
 
         
