@@ -18,6 +18,7 @@ import streamlit as st
 from stqdm import stqdm
 from time import sleep
 from gingerit.gingerit import GingerIt
+import VIcount
 # import Caribe as cb
 
 # Load Data
@@ -30,9 +31,12 @@ special_char = pd.read_csv('Special characters list.csv')
 parser = GingerIt()
 messages = {'ASIN':['ASIN of the product'],'MRP':['Max Retail Price'], 'aplus_images':['Image links of the Aplus content'],
  'aplus_text':['Text extracted in Aplus content'], 'brand':['Brand Name'], 'bullets':['Bullet Points extracted'], 
- 'description':['Product Description Available'], 'image_links':['Product Image links'],'price':['Price of the Product'], 
- 'ratings':['Ratings givent the product'], 'ratings_count':['Number of ratings'], 'title':['Title of the Product'], 
- 'url':['Product URL'], 'video_links':['Video links of listed products']}
+ 'country_of_origin':['Country of Product Origin'], 'dimensions':['Dimesions details available in Product Information Section'],
+ 'discount':['Discount Available on the Product Price'], 'description':['Product Description Available'],
+ 'image_links':['Product Image links'],'price':['Price of the Product'], 'net_quantity':['Quantity of items in the product'],
+ 'offers':['Offers available on the Product Listing'], 'ratings':['Ratings givent the product'],
+ 'ratings_breakdown':['Breakdown of Ratings for 1,2,3,4,5 stars'], 'ratings_count':['Number of ratings'], 'title':['Title of the Product'], 
+ 'url':['Product URL'], 'video_links':['Video links of listed products'],'weight':['Weight of the Product']}
 ###########################################################################################################
 # Helper Functions
 ###########################################################################################################
@@ -55,38 +59,14 @@ def sentence_case(brand_name,title,brand_present_title):
 
 ###########################################################################################################
 
-def spellcheck(txt,model):
-    res = model.check(txt)
-    logger.info(res)
-    if len(res)>0:
-        flg = 0
-    else:
-        flg = 1
-    return [flg,res]
-
-# def runGinger(txt,my_tool):
-#     logger.info(txt)
-#     sentences = txt.split('\n')
-#     logger.info('sentences are : {}'.format('sentences'))
-#     flg = 1
-#     corrections = []
-#     for sentence in sentences:
-#         if len(sentence)>280:
-#             words = sentence.split(' ')
-#             for i in range(len(words)-50):
-#                 sen = ' '.join(words[i:i+50])
-#                 parse_res = my_tool.parse(sen)
-#                 if len(parse_res['corrections'])>0:
-#                     # for corr in parse_res['corrections']:
-#                     # if corr['definition']!='Accept p'
-#                     flg = 0
-#                 corrections.append(parse_res['corrections'])
-#         else:
-#             parse_res = my_tool.parse(sentence)
-#             if len(parse_res['corrections'])>0:
-#                 flg = 0
-#             corrections.append(parse_res['corrections'])
-#     return [flg,corrections]
+# def spellcheck(txt,model):
+#     res = model.check(txt)
+#     logger.info(res)
+#     if len(res)>0:
+#         flg = 0
+#     else:
+#         flg = 1
+#     return [flg,res]
 
 def runGinger(txt,my_tool):
     if txt=='NA':
@@ -102,15 +82,28 @@ def runGinger(txt,my_tool):
             if len(sentence)>600:
                 logger.info('sentence char len is greater than 600')
                 order = "[+-]?\d+\.\d+"
-                first_str = re.sub(order, '', sentence)
-                lines = re.split( r'[?.!]',first_str)
-                for i in lines:
+                p = re.compile(order)
+                floats = p.findall(sentence)
+                logger.info(floats)
+                first_str = sentence
+                float_replaces = []
+                for f in set(floats):
+                    first_str = first_str.replace(f,f.replace('.','point'))
+                    float_replaces.append([f.replace('.','point'),f])
+                    logger.info(first_str)
+                delimiters_regex = "[?.!|]"
+                delimiters_re = re.compile(delimiters_regex)
+                delimiters = delimiters_re.findall(first_str)
+                logger.info('delimiters are {}'.format(delimiters))
+                lines = re.split( r'[?.!|]',first_str)
+                if len(lines)>len(delimiters):
+                    delimiters.append('')
+                for i,d in zip(lines,delimiters):
+                    [i := i.replace(a, b) for a, b in float_replaces]
                     parse_res = my_tool.parse(i)
                     if len(parse_res['corrections'])>0:
-                        # for corr in parse_res['corrections']:
-                        # if corr['definition']!='Accept p'
                         flg = 0
-                    result.append(parse_res['result'])
+                    result.append(parse_res['result']+d)
                     corrections.append(parse_res['corrections'])
             else:
                 parse_res = my_tool.parse(sentence)
@@ -350,7 +343,7 @@ def get_dimensions(text):
 def get_Dimensions_flag(data):
     dim1 = st.empty()
     dim1.caption('Dimensions Check: ')
-    data['complete_data'] = data['title']+'. '+ data['description']+'. '+data['bullets']#+
+    data['complete_data'] = data['title']+'. '+ data['description']+'. '+data['bullets'] + '. ' + data['dimensions']#+
     data['final_dimensionality_check'] = data['complete_data'].progress_apply(lambda x: get_dimensions(x))
     messages['final_dimensionality_check'] = ['Dimensions Check Flag']
     # logger.info(data['dimension_check_res'])
@@ -365,6 +358,42 @@ def get_SentenceCase_flag(data):
     messages['final_sentence_case_check'] = ['Title Sentence Case Flag']
 
     return data['final_sentence_case_check']
+
+##############################################################################################################
+## Get Video Image Count
+def video_image_count(data):
+    data[['Image_Count','Video_count']] = data['url'].progress_apply(lambda x:VIcount.VIcount.get_video_image_count(x)).tolist()
+    # return data['Image_Count','Video_count']
+
+##############################################################################################################
+## Get A+content Flag
+def get_aplus_check_flag(data):
+    ap1 = st.empty()
+    ap1.caption('A+ Content presence check: ')
+    data['aplus_content_check'] = data['aplus_text'].apply(lambda x:1 if x!='NA' else 0)
+    messages['aplus_content_check'] = ['Check to see if A+ content is available']
+
+    ap2 = st.empty()
+    ap2.caption('Special Character Check: ')
+    data['aplus_text_special_chr_check'] = data['aplus_text'].apply(lambda x:special_char_check(x))
+    messages['aplus_text_special_chr_check'] = ['Check to see if A+ Text contains any special charater']
+
+    ap3 = st.empty()
+    ap3.caption('Spell Grammar Check Check: ')
+    data[['aplus_text_spellcheck','aplus_text_corrections','aplus_text_Corrected_text']] =  pd.DataFrame(data['aplus_text'].progress_apply(lambda x: runGinger(x,parser)).tolist())
+    messages['aplus_text_spellcheck'] = ['Check if the A+ content is grammatically correct']
+    messages['aplus_text_corrections'] = ['Correct A+ content text after spellcheck']
+    messages['aplus_text_Corrected_text'] = ['Corrected A+ content text']
+
+    ## Final A+ content check Flag
+    data['final_aplus_check_flag'] = data[['aplus_content_check','aplus_text_special_chr_check','aplus_text_spellcheck']].product(axis = 1)
+    messages['final_aplus_check_flag'] = ['Overall A+ content Check Flag']
+
+
+##############################################################################################################
+## Ratings count individually
+def get_ratings_count(data):
+    data['ratings_count','ratings_breakdown']
 
 ##############################################################################################################
 ## Get all the flags
@@ -416,9 +445,31 @@ def QC_check1(data):
     logger.info('Sentence Case Check Completed!!!')
     text6.write('Sentence Case Check Completed!!!')
 
-    data['Grade2'] = data[['final_entire_spellcheck','final_dimensionality_check','final_sentence_case_check']].sum(axis = 1)
-    data['Grade2'] = data['Grade2'].apply(lambda x: 'A' if x==3 else('B' if x==2 else 'C'))
+    text7 = st.empty()
+    logger.info('Video Image Count check started')
+    text7.write('Video Image Count check started')
+    video_image_count(data)
+    messages['Image_Count'] = ['Number of images in the listing']
+    messages['Video_Count'] = ['Number of videos in the listing']
+    logger.info('Video Image Count check Completed!!!')
+
+    # logger.info('Video Image Count check started')
+    # text6.write('Video Image Count check started')
+    # video_image_count(data)
+    # messages['Image_Count'] = ['Number of images in the listing']
+    # messages['Video_Count'] = ['Number of videos in the listing']
+    # logger.info('Video Image Count check Completed!!!')
+
+    text8 = st.empty()
+    logger.info('A+ content check started')
+    text8.write('A+ content check started')
+    get_aplus_check_flag(data)
+    logger.info('A+ content check Completed!!!')
+    
+    data['Grade2'] = data[['final_entire_spellcheck','final_dimensionality_check','final_sentence_case_check','final_aplus_check_flag']].sum(axis = 1)
+    data['Grade2'] = data['Grade2'].apply(lambda x: 'A' if x==4 else('B' if x==3 else 'C'))
     messages['Grade2'] = ['Grade 2 Score']
+
     tooltips_df = pd.DataFrame(messages)
     data.style.set_tooltips(tooltips_df)
     # st.write(messages)

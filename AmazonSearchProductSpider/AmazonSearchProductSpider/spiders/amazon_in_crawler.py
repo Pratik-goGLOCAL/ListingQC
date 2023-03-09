@@ -14,6 +14,7 @@ import pandas as pd
 from loguru import logger
 from fake_headers import Headers
 import pickle
+import streamlit as st
 from ..settings import PROXIES,HEADERS ,update_roxy
 
 def get_useragent():
@@ -27,6 +28,9 @@ class AmazonSearchProductSpider(scrapy.Spider):
     def start_requests(self):       
         with open('DataStore/keyword_list.pickle', 'rb') as handle:
             keyword_list = pickle.load(handle)
+        with open('DataStore/_category.pickle', 'rb') as handle:
+            category = pickle.load(handle)
+        logger.info('category selected {}'.format(category))
         logger.info('Keyword List before is {}'.format(keyword_list.values()))
         logger.info('Keyword List contains "," {}'.format(',' in list(keyword_list.values())[0]))
         if ',' in list(keyword_list.values())[0]:
@@ -42,9 +46,14 @@ class AmazonSearchProductSpider(scrapy.Spider):
                                     callback=self.parse,
                                     headers=random.choice(HEADERS))
         else:
+            logger.info('In Crawler Category Session State is {}'.format(category))
             for keyword in search_text:
                 logger.info('Keyword is {}'.format(keyword))
-                amazon_search_url = f'https://www.amazon.in/s?k={keyword}&page=1'
+                if category!='all':
+                    amazon_search_url = f'https://www.amazon.in/s?k={keyword}&i='+category+'&page=1'
+                else:
+                    amazon_search_url = f'https://www.amazon.in/s?k={keyword}&page=1'
+                logger.info('URL is {}'.format(amazon_search_url))
                 yield scrapy.Request(url=amazon_search_url, 
                                     callback=self.discover_product_urls, 
                                     meta={'keyword': keyword, 'page': 1,},
@@ -200,7 +209,7 @@ class AmazonSearchProductSpider(scrapy.Spider):
             #items['model_number']  = get_prod_details_table("Model Number")
             items['brand']=get_prod_details_table('Brand')
             items['material']  = get_prod_details_table("Material")
-            #items['dimensions'] = get_prod_details_table("Dimensions")
+            items['dimensions'] = get_prod_details_table("Dimensions")
             
             #PROD DETAILS SECTION        
             items["country_of_origin"] = get_prod_details_table("Country of Origin")
@@ -217,7 +226,11 @@ class AmazonSearchProductSpider(scrapy.Spider):
             items['special_offers']="".join([i.strip()  for i in response.css('#quickPromoBucketContent li span::text').getall()])
             items['important_info'] = " ".join(response.css("#important-information p::text").getall())
             items['type_of_offers'] =response.css(".a-carousel-card h6::text").getall()
-            items['offers'] =response.css(".a-carousel-card .a-section.a-spacing-none.offers-items-content span::text").getall()  
+            items['offers'] =response.css(".a-carousel-card .a-section.a-spacing-none.offers-items-content span::text").getall()
+
+            #Ratings Breakdown
+            items['ratings_breakdown'] = response.css("#histogramTable tr::attr('aria-label')").extract()
+
             
             print(items['title'])          
             yield items

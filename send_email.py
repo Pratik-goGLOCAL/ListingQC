@@ -46,6 +46,6 @@ def send_email(r_email,filename):
 
     # Send the email
     # Leave this parameter out if using environment variable 'EMAIL_PASSWORD'
-    new_mail.send('sdqymwrluxqcytnx')
+    new_mail.send('gtpjxmfpswyqzbqy')
     os.remove('DataStore/'+filename)
     st.write('Results successfully sent to your email address!!!')

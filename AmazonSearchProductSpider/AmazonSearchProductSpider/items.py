@@ -53,5 +53,7 @@ class AmazonsearchproductspiderItem(scrapy.Item):
     offers = scrapy.Field()
     attributes = scrapy.Field()
     # = scrapy.Field()
-    # = scrapy.Field()
+    dimensions = scrapy.Field()
+    ratings_breakdown=scrapy.Field()
+
     

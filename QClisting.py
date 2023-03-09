@@ -28,6 +28,8 @@ st.title("Listing QC")
 data = pd.read_csv('excel_check.csv')
 data.fillna('NULL',inplace = True)
 
+with open('amazon_categories.pickle', 'rb') as handle:
+    amazon_categories = pickle.load(handle)
 
 # Initialize Variables
 if "r_email" not in st.session_state:
@@ -42,6 +44,8 @@ if "asin_brand" not in st.session_state:
     st.session_state["asin_brand"] = ""
 if "ASIN" not in st.session_state:
     st.session_state["ASIN"] = ""
+if "category" not in st.session_state:
+    st.session_state["category"] = ""
 # Enter email to send the results on 
 email_place = st.empty()
 r_email = email_place.text_input('Enter e-mail address to get results via mail', st.session_state["r_email"])
@@ -68,10 +72,16 @@ marketplace = marketplace_place.multiselect(label='Select Market Places',
 st.session_state['Market_Place'] = marketplace
 
 asin_brand_place = st.empty()
+
 asin_brand = asin_brand_place.selectbox(label='Select ASIN or Brand',
                     options=['Brand Name','ASIN'],disabled=False)
-# st.write('The options selected are:', marketplace)
 st.session_state['asin_brand'] = asin_brand
+
+category_place = st.empty()
+category = category_place.selectbox(label='Select the Category',
+                    options=list(amazon_categories.keys()) ,disabled=False)
+# st.write('The options selected are:', marketplace)
+st.session_state['category'] = category
 logger.info(st.session_state['asin_brand'])
 # Select the Brand Name
 if st.session_state['asin_brand']=='ASIN':
@@ -80,6 +90,12 @@ if st.session_state['asin_brand']=='ASIN':
     # logger.info([x.strip() for x in search_text.split(',')])
     
     st.session_state["ASIN"] = search_text #[x.strip() for x in search_text.split(',')]
+elif st.session_state['asin_brand']=='URL':
+    url_place = st.empty()
+    search_text = url_place.text_input("Search for an URL", st.session_state["URL"])
+    # logger.info([x.strip() for x in search_text.split(',')])
+    
+    st.session_state["URL"] = search_text #[x.strip() for x in search_text.split(',')]
 else:
     brandname_place = st.empty()
     search_text = brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"])
@@ -94,6 +110,8 @@ keyword_list = {st.session_state['asin_brand']:search_text}
 logger.info(keyword_list)
 with open('DataStore/keyword_list.pickle', 'wb') as handle:
     pickle.dump(keyword_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open('DataStore/_category.pickle', 'wb') as handle:
+    pickle.dump(amazon_categories[category], handle, protocol=pickle.HIGHEST_PROTOCOL)
 @st.cache
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -113,7 +131,10 @@ if not stop and submit:
         asin_place.text_input("Search for an ASIN", st.session_state["ASIN"],disabled = True,key = 'asinplace')
     else:
         brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = True,key = 'brandplace')
-    
+    asin_brand_place.selectbox(label='Select ASIN or Brand',
+                    options=['Brand Name','ASIN'],disabled=True, key = 'asin_brand')
+    category_place.selectbox(label='Select the Category',
+                    options=list(amazon_categories.keys()) ,disabled=True,key = 'category')
     st.caption('The Scraping+Listing QC Checks are in process. PLEASE DO NOT CLOSE THE TAB')
     st.caption('To stop the process press the Stop button and refresh the page')
     textplace = st.empty()
@@ -156,6 +177,10 @@ if not stop and submit:
         asin_place.text_input("Search for an ASIN", st.session_state["ASIN"],disabled = False,key = 'asinplace3')
     else:
         brandname_place.text_input("Search for a Brand Name (if multiple then separate using ' , ') e.g. Yellow Chimes", st.session_state["Brand_name"],disabled = False,key = 'brandplace3')
+    asin_brand_place.selectbox(label='Select ASIN or Brand',
+                    options=['Brand Name','ASIN'],disabled=True, key = 'asin_brand3')
+    category_place.selectbox(label='Select the Category',
+                    options=list(amazon_categories.keys()) ,disabled=True,key = 'category3')
     # st.dataframe(res_df[[col for col in res_df.columns if 'Corrected_text' not in col]])
     st.dataframe(res_df)
 
